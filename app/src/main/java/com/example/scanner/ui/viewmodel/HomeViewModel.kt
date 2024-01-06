@@ -22,9 +22,10 @@ class HomeViewModel @Inject constructor(
     fun getProjectList() {
         viewModelScope.launch(Dispatchers.IO) {
             _homeUiState.value = HomeUiState.Success(
-                projectRepository.getAllProject().mapIndexed {index, entity ->
+                allProjectListItemCheckedState = false,
+                projectListItemUiModelList = projectRepository.getAllProject().mapIndexed {index, entity ->
                     ProjectListItemUiModel(
-                        id = index,
+                        sequenceId = index,
                         projectName = entity.projectName,
                         modifyTime = entity.modifyTime,
                         itemChecked = false,
@@ -35,8 +36,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun changeProjectItemCheckedStatus
+    fun switchProjectListItemCheckedState
                 (projectListItemUiModel: ProjectListItemUiModel) {
+
         // remain the models of all other items
         // only change the checked status of the selected item
         // trigger ui update by setting MutableStateFlow.value
@@ -46,26 +48,52 @@ class HomeViewModel @Inject constructor(
                 HomeUiState.Error -> {}
                 HomeUiState.Loading -> {}
                 is HomeUiState.Success -> {
-                    val isChecked = (_homeUiState.value as HomeUiState.Success)
-                        .projectListItemUiModelList[projectListItemUiModel.id].itemChecked
 
                     // update the list of the list item checked state by creating a new list object
 
                     val newItemList = (_homeUiState.value as HomeUiState.Success)
                         .projectListItemUiModelList.map { model ->
-                            if (model.id == projectListItemUiModel.id) {
-                                model.copy(itemChecked = !isChecked)
+                            if (model.sequenceId == projectListItemUiModel.sequenceId) {
+                                model.copy(itemChecked = !projectListItemUiModel.itemChecked)
                             } else {
                                 model
                             }
                         }
-                    _homeUiState.value = HomeUiState.Success(newItemList)
+
+                    _homeUiState.value = HomeUiState.Success(
+                        (_homeUiState.value as HomeUiState.Success).allProjectListItemCheckedState,
+                        newItemList
+                    )
                 }
             }
         }
     }
 
-    fun changeProjectItemMenuVisibility(projectListItemUiModel: ProjectListItemUiModel) {
+    fun switchAllProjectListItemCheckedState(allItemChecked: Boolean) {
+        viewModelScope.launch {
+            when(homeUiState.value) {
+                HomeUiState.Error -> {}
+                HomeUiState.Loading -> {}
+                is HomeUiState.Success -> {
+
+                    // update the list of the list item checked state by creating a new list object
+
+                    val newItemList = (_homeUiState.value as HomeUiState.Success)
+                        .projectListItemUiModelList.map { model ->
+                                model.copy(itemChecked = allItemChecked)
+                        }
+
+                    _homeUiState.value = HomeUiState.Success(
+                        allItemChecked,
+                        newItemList
+                    )
+                }
+            }
+        }
+    }
+
+    fun switchProjectListItemMenuVisibility(projectListItemUiModel: ProjectListItemUiModel) {
+
         // remain the models of all other items
         // only change the menu visibility state of the selected item
         // trigger ui update by setting MutableStateFlow.value
@@ -75,20 +103,21 @@ class HomeViewModel @Inject constructor(
                 HomeUiState.Error -> {}
                 HomeUiState.Loading -> {}
                 is HomeUiState.Success -> {
-                    val menuVisible = (_homeUiState.value as HomeUiState.Success)
-                        .projectListItemUiModelList[projectListItemUiModel.id].menuVisible
 
                     // update the list of the list item checked state by creating a new list object
 
                     val newItemList = (_homeUiState.value as HomeUiState.Success)
                         .projectListItemUiModelList.map { model ->
-                            if (model.id == projectListItemUiModel.id) {
-                                model.copy(menuVisible = !menuVisible)
+                            if (model.sequenceId == projectListItemUiModel.sequenceId) {
+                                model.copy(menuVisible = !projectListItemUiModel.menuVisible)
                             } else {
                                 model
                             }
                         }
-                    _homeUiState.value = HomeUiState.Success(newItemList)
+                    _homeUiState.value = HomeUiState.Success(
+                        (_homeUiState.value as HomeUiState.Success).allProjectListItemCheckedState,
+                        newItemList
+                    )
                 }
             }
         }
@@ -96,7 +125,7 @@ class HomeViewModel @Inject constructor(
 }
 
 data class ProjectListItemUiModel (
-    val id: Int,
+    val sequenceId: Int,
     val projectName: String,
     val modifyTime: String,
     val itemChecked: Boolean,
@@ -105,6 +134,7 @@ data class ProjectListItemUiModel (
 
 sealed class HomeUiState {
     data class Success (
+        val allProjectListItemCheckedState: Boolean,
         val projectListItemUiModelList: List<ProjectListItemUiModel>
     ): HomeUiState()
     data object Loading: HomeUiState()

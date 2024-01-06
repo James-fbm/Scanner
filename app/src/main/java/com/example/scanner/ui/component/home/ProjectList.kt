@@ -1,6 +1,7 @@
 package com.example.scanner.ui.component.home
 
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -15,14 +16,16 @@ fun ProjectList(
     onItemCheckedChanged: (ProjectListItemUiModel) -> Unit,
     onMenuVisibleChanged: (ProjectListItemUiModel) -> Unit
 ) {
-    LazyColumn {
+    LazyColumn(
+        modifier = Modifier.fillMaxHeight(0.6f)
+    ) {
         items(count = projectListItemUiModelList.size) { index ->
             ProjectListItem (
                 projectListItemUiModel = projectListItemUiModelList[index],
                 onItemCheckedChanged = onItemCheckedChanged,
                 onMenuVisibleChanged = onMenuVisibleChanged
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
