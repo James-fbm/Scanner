@@ -9,6 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -25,7 +27,8 @@ import com.example.scanner.ui.viewmodel.ProjectListItemUiModel
 @Composable
 fun ProjectListItem (
     projectListItemUiModel: ProjectListItemUiModel,
-    onItemCheckedChange: (ProjectListItemUiModel) -> Unit
+    onItemCheckedChanged: (ProjectListItemUiModel) -> Unit,
+    onMenuVisibleChanged: (ProjectListItemUiModel) -> Unit
 ) {
     ListItem(
         modifier = Modifier.clickable {
@@ -54,20 +57,36 @@ fun ProjectListItem (
         },
         leadingContent = {
             Checkbox(
-                checked = projectListItemUiModel.isChecked,
+                checked = projectListItemUiModel.itemChecked,
                 onCheckedChange = {
-                    onItemCheckedChange(projectListItemUiModel)
+                    onItemCheckedChanged(projectListItemUiModel)
                 }
             )
         },
         trailingContent = {
             IconButton(
-                onClick = {}
+                onClick = {
+                    onMenuVisibleChanged(projectListItemUiModel)
+                }
             ) {
                 Icon(
                     Icons.Outlined.MoreVert,
                     contentDescription = null
                 )
+                DropdownMenu(
+                    expanded = projectListItemUiModel.menuVisible,
+                    onDismissRequest = {
+                        onMenuVisibleChanged(projectListItemUiModel)
+                    }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Menu Item 1") },
+                        onClick = {
+                            onMenuVisibleChanged(projectListItemUiModel)
+                        }
+                    )
+                    // Add more items as needed
+                }
             }
         }
     )
@@ -80,9 +99,10 @@ fun ProjectListItemPreview() {
         1,
         "项目",
         "2024-01-02",
-        false
+        false,
+        true
     )
     ProjectListItem (
-        projectListItemUiModel
-    ) {}
+        projectListItemUiModel, {}, {}
+    )
 }

@@ -45,8 +45,11 @@ fun HomeMain(
                 HomeUiState.Loading -> Loading()
                 is HomeUiState.Success -> ProjectList(
                     (homeUiState as HomeUiState.Success).projectListItemUiModelList,
-                    onItemCheckedChange = { projectListItemUiModel ->
+                    onItemCheckedChanged = { projectListItemUiModel ->
                         homeViewModel.changeProjectItemCheckedStatus(projectListItemUiModel)
+                    },
+                    onMenuVisibleChanged = { projectListItemUiModel ->
+                        homeViewModel.changeProjectItemMenuVisibility(projectListItemUiModel)
                     }
                 )
             }
