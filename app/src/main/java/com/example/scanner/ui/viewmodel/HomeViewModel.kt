@@ -1,5 +1,6 @@
 package com.example.scanner.ui.viewmodel
 
+import androidx.compose.ui.state.ToggleableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scanner.data.repo.ProjectRepository
@@ -22,7 +23,7 @@ class HomeViewModel @Inject constructor(
     fun getProjectList() {
         viewModelScope.launch(Dispatchers.IO) {
             _homeUiState.value = HomeUiState.Success(
-                allProjectListItemCheckedState = false,
+                allProjectListItemCheckedState = ToggleableState.Off,
                 projectListItemUiModelList = projectRepository.getAllProject().mapIndexed {index, entity ->
                     ProjectListItemUiModel(
                         sequenceId = index,
@@ -49,19 +50,36 @@ class HomeViewModel @Inject constructor(
                 HomeUiState.Loading -> {}
                 is HomeUiState.Success -> {
 
+                    var newListToggleableState: ToggleableState = ToggleableState.Indeterminate
+                    var checkedItemCount: Int = 0
+
                     // update the list of the list item checked state by creating a new list object
 
                     val newItemList = (_homeUiState.value as HomeUiState.Success)
                         .projectListItemUiModelList.map { model ->
                             if (model.sequenceId == projectListItemUiModel.sequenceId) {
+                                if (!model.itemChecked)
+                                    checkedItemCount += 1
+
                                 model.copy(itemChecked = !projectListItemUiModel.itemChecked)
                             } else {
+                                if (model.itemChecked)
+                                    checkedItemCount += 1
+
                                 model
                             }
                         }
 
+                    if (checkedItemCount == (_homeUiState.value as HomeUiState.Success).
+                        projectListItemUiModelList.size) {
+                        newListToggleableState = ToggleableState.On
+                    }
+
+                    if (checkedItemCount == 0)
+                        newListToggleableState = ToggleableState.Off
+
                     _homeUiState.value = HomeUiState.Success(
-                        (_homeUiState.value as HomeUiState.Success).allProjectListItemCheckedState,
+                        newListToggleableState,
                         newItemList
                     )
                 }
@@ -69,12 +87,20 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun switchAllProjectListItemCheckedState(allItemChecked: Boolean) {
+    fun switchAllProjectListItemCheckedState(allProjectListItemCheckedState: ToggleableState) {
         viewModelScope.launch {
             when(homeUiState.value) {
                 HomeUiState.Error -> {}
                 HomeUiState.Loading -> {}
                 is HomeUiState.Success -> {
+                    var allItemChecked: Boolean = false
+                    var newListToggleableState: ToggleableState = ToggleableState.Off
+
+                    if (allProjectListItemCheckedState == ToggleableState.Indeterminate
+                        || allProjectListItemCheckedState == ToggleableState.Off) {
+                        allItemChecked = true
+                        newListToggleableState = ToggleableState.On
+                    }
 
                     // update the list of the list item checked state by creating a new list object
 
@@ -84,7 +110,7 @@ class HomeViewModel @Inject constructor(
                         }
 
                     _homeUiState.value = HomeUiState.Success(
-                        allItemChecked,
+                        newListToggleableState,
                         newItemList
                     )
                 }
@@ -134,7 +160,7 @@ data class ProjectListItemUiModel (
 
 sealed class HomeUiState {
     data class Success (
-        val allProjectListItemCheckedState: Boolean,
+        val allProjectListItemCheckedState: ToggleableState,
         val projectListItemUiModelList: List<ProjectListItemUiModel>
     ): HomeUiState()
     data object Loading: HomeUiState()

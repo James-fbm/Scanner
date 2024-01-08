@@ -32,45 +32,27 @@ fun HomeMain(
     LaunchedEffect(Unit) {
         homeViewModel.getProjectList()
     }
-    
+
     Scaffold(
-        topBar = { TopNavigator()}
+        topBar = { TopNavigator()},
+        bottomBar = {
+            BottomButtonGroup()
+        }
     ) {innerPadding ->
         Column(
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(innerPadding).padding(top = 12.dp)
         ) {
-            Spacer(modifier = Modifier.padding(innerPadding))
-            Spacer(modifier = Modifier.height(12.dp))
-
             when(homeUiState) {
                 HomeUiState.Error -> Error()
                 HomeUiState.Loading -> Loading()
                 is HomeUiState.Success ->  {
-                    Row ( modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Checkbox(
-                            checked = (homeUiState as HomeUiState.Success).allProjectListItemCheckedState,
-                            onCheckedChange = {checkedState ->
-                                homeViewModel.switchAllProjectListItemCheckedState(checkedState)
-                                println("checked state: $checkedState")
-                            })
-                        Spacer(modifier = Modifier.weight(1f))
-                        IconButton(
-                            onClick = {}
-                        ) {
-                            Icon(
-                                Icons.Outlined.List,
-                                contentDescription = null,
-                            )
-                        }
-                    }
-
-                    ProjectList(
-                        (homeUiState as HomeUiState.Success).projectListItemUiModelList,
+                    ProjectDisplayBody(
+                        allProjectListItemCheckedState = (homeUiState as HomeUiState.Success).allProjectListItemCheckedState,
+                        projectListItemUiModelList = (homeUiState as HomeUiState.Success).projectListItemUiModelList,
+                        onAllProjectListItemCheckedStateChanged = {checkedState ->
+                            homeViewModel.switchAllProjectListItemCheckedState(checkedState)
+                        },
                         onItemCheckedChanged = { projectListItemUiModel ->
                             homeViewModel.switchProjectListItemCheckedState(projectListItemUiModel)
                         },
@@ -80,8 +62,6 @@ fun HomeMain(
                     )
                 }
             }
-
-
         }
     }
 }
