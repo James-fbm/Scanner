@@ -33,29 +33,29 @@ fun HomeMain(
         homeViewModel.getProjectList()
     }
 
-    Scaffold(
-        topBar = { TopNavigator()},
-        bottomBar = {
-            when(homeUiState) {
-                HomeUiState.Error -> {}
-                HomeUiState.Loading -> {}
-                is HomeUiState.Success -> {
+    when(homeUiState) {
+        HomeUiState.Error -> Error()
+        HomeUiState.Loading -> Loading()
+        is HomeUiState.Success -> {
+            Scaffold(
+                topBar = {
+                    TopNavigator(
+                        topSearchBarInput = (homeUiState as HomeUiState.Success).topSearchBarInput
+                    ) { topSearchBarInput ->
+                        homeViewModel.updateTopSearchBarInput(topSearchBarInput)
+                    }
+                },
+                bottomBar = {
                     BottomButtonGroup(
                         enableProjectListItemDelete =
                         (homeUiState as HomeUiState.Success).enableProjectListItemDelete
                     )
                 }
-            }
-        }
-    ) {innerPadding ->
-        Column(
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(innerPadding).padding(top = 12.dp)
-        ) {
-            when(homeUiState) {
-                HomeUiState.Error -> Error()
-                HomeUiState.Loading -> Loading()
-                is HomeUiState.Success ->  {
+            ) {innerPadding ->
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(innerPadding).padding(top = 12.dp)
+                ) {
                     ProjectDisplayBody(
                         allProjectListItemCheckedState = (homeUiState as HomeUiState.Success).allProjectListItemCheckedState,
                         projectListItemUiModelList = (homeUiState as HomeUiState.Success).projectListItemUiModelList,
