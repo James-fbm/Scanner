@@ -1,9 +1,11 @@
 package com.example.scanner.ui.component.home
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,28 +17,50 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.scanner.ui.viewmodel.TopSearchBarUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopNavigator (
-    topSearchBarInput: String,
+    topSearchBarUiModel: TopSearchBarUiModel,
+    onSearchBarActiveChanged: () -> Unit,
     onSearchBarInputChanged: (String) -> Unit
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(horizontal = 12.dp)
     ){
-        IconButton(onClick = {}) {
-            Icon(Icons.Outlined.ArrowBack, contentDescription = null)
+        if (!topSearchBarUiModel.activeState) {
+            IconButton(onClick = {}) {
+                Icon(Icons.Outlined.ArrowBack, contentDescription = null)
+            }
         }
         SearchBar(
-            active = false,
-            onActiveChange = {},
+            modifier = Modifier.fillMaxWidth(),
+            active = topSearchBarUiModel.activeState,
+            onActiveChange = {
+                onSearchBarActiveChanged()
+            },
             onQueryChange = {input ->
                 onSearchBarInputChanged(input)
             },
-            onSearch = {},
+            onSearch = {
+
+            },
             placeholder = { Text("Search") },
-            leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
+            leadingIcon = {
+                if (!topSearchBarUiModel.activeState) {
+                    Icon(Icons.Outlined.Search, contentDescription = null)
+                } else {
+                    IconButton(
+                        onClick = {
+                            onSearchBarInputChanged("")
+                        }
+                    ) {
+                        Icon(Icons.Outlined.Clear, contentDescription = null)
+                    }
+                }},
             trailingIcon = {
                 IconButton(
                     onClick = {}
@@ -44,7 +68,7 @@ fun TopNavigator (
                     Icon(Icons.Outlined.Menu, contentDescription = null)
                 }
             },
-            query = topSearchBarInput
+            query = topSearchBarUiModel.inputQuery
         ) {
 
         }
@@ -56,5 +80,5 @@ fun TopNavigator (
 @Preview
 @Composable
 fun TopNavigatorPreview() {
-    TopNavigator("Project", {})
+    TopNavigator(TopSearchBarUiModel( true, "Project" ), {}, {})
 }

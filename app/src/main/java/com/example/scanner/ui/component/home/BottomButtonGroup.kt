@@ -26,7 +26,7 @@ fun BottomButtonGroup(
     BottomAppBar {
         Row ( modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -45,6 +45,5 @@ fun BottomButtonGroup(
                 Icon(Icons.Filled.Add, contentDescription = null)
             }
         }
-
     }
 }
