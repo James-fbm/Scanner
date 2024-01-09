@@ -24,6 +24,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _homeUiState.value = HomeUiState.Success(
                 allProjectListItemCheckedState = ToggleableState.Off,
+                enableProjectListItemDelete = false,
                 projectListItemUiModelList = projectRepository.getAllProject().mapIndexed {index, entity ->
                     ProjectListItemUiModel(
                         sequenceId = index,
@@ -51,6 +52,7 @@ class HomeViewModel @Inject constructor(
                 is HomeUiState.Success -> {
 
                     var newListToggleableState: ToggleableState = ToggleableState.Indeterminate
+                    var enableItemDelete: Boolean = false
                     var checkedItemCount: Int = 0
 
                     // update the list of the list item checked state by creating a new list object
@@ -58,13 +60,17 @@ class HomeViewModel @Inject constructor(
                     val newItemList = (_homeUiState.value as HomeUiState.Success)
                         .projectListItemUiModelList.map { model ->
                             if (model.sequenceId == projectListItemUiModel.sequenceId) {
-                                if (!model.itemChecked)
+                                if (!model.itemChecked) {
                                     checkedItemCount += 1
+                                    enableItemDelete = true
+                                }
 
                                 model.copy(itemChecked = !projectListItemUiModel.itemChecked)
                             } else {
-                                if (model.itemChecked)
+                                if (model.itemChecked) {
                                     checkedItemCount += 1
+                                    enableItemDelete = true
+                                }
 
                                 model
                             }
@@ -80,6 +86,7 @@ class HomeViewModel @Inject constructor(
 
                     _homeUiState.value = HomeUiState.Success(
                         newListToggleableState,
+                        enableItemDelete,
                         newItemList
                     )
                 }
@@ -93,12 +100,15 @@ class HomeViewModel @Inject constructor(
                 HomeUiState.Error -> {}
                 HomeUiState.Loading -> {}
                 is HomeUiState.Success -> {
+
                     var allItemChecked: Boolean = false
+                    var enableItemDelete: Boolean = false
                     var newListToggleableState: ToggleableState = ToggleableState.Off
 
                     if (allProjectListItemCheckedState == ToggleableState.Indeterminate
                         || allProjectListItemCheckedState == ToggleableState.Off) {
                         allItemChecked = true
+                        enableItemDelete = true
                         newListToggleableState = ToggleableState.On
                     }
 
@@ -111,6 +121,7 @@ class HomeViewModel @Inject constructor(
 
                     _homeUiState.value = HomeUiState.Success(
                         newListToggleableState,
+                        enableItemDelete,
                         newItemList
                     )
                 }
@@ -142,6 +153,7 @@ class HomeViewModel @Inject constructor(
                         }
                     _homeUiState.value = HomeUiState.Success(
                         (_homeUiState.value as HomeUiState.Success).allProjectListItemCheckedState,
+                        (_homeUiState.value as HomeUiState.Success).enableProjectListItemDelete,
                         newItemList
                     )
                 }
@@ -161,6 +173,7 @@ data class ProjectListItemUiModel (
 sealed class HomeUiState {
     data class Success (
         val allProjectListItemCheckedState: ToggleableState,
+        val enableProjectListItemDelete: Boolean,
         val projectListItemUiModelList: List<ProjectListItemUiModel>
     ): HomeUiState()
     data object Loading: HomeUiState()

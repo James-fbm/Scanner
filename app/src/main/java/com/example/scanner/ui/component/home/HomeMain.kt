@@ -36,7 +36,16 @@ fun HomeMain(
     Scaffold(
         topBar = { TopNavigator()},
         bottomBar = {
-            BottomButtonGroup()
+            when(homeUiState) {
+                HomeUiState.Error -> {}
+                HomeUiState.Loading -> {}
+                is HomeUiState.Success -> {
+                    BottomButtonGroup(
+                        enableProjectListItemDelete =
+                        (homeUiState as HomeUiState.Success).enableProjectListItemDelete
+                    )
+                }
+            }
         }
     ) {innerPadding ->
         Column(
