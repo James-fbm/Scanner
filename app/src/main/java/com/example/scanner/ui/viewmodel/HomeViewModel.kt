@@ -29,7 +29,7 @@ class HomeViewModel @Inject constructor(
                     false,
                     ""
                 ),
-                projectListItemUiModelList = projectRepository.getAllProject().mapIndexed {index, entity ->
+                projectListItemUiModelList = projectRepository.getExampleProjectList().mapIndexed { index, entity ->
                     ProjectListItemUiModel(
                         sequenceId = index,
                         projectName = entity.projectName,

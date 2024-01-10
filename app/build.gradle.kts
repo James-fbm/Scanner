@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.material3)
 
     implementation(libs.hilt.android)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     ksp(libs.hilt.android.compiler)
 
     implementation(libs.room.runtime)
