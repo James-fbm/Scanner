@@ -1,8 +1,9 @@
 package com.example.scanner.data.repo
 
 import com.example.scanner.data.entity.ProjectListItemEntity
+import javax.inject.Inject
 
-class ProjectRepository {
+class ProjectRepository @Inject constructor() {
     fun getAllProject(): List<ProjectListItemEntity> {
         val projectListItemEntityList = mutableListOf<ProjectListItemEntity>()
         for (i in 1..10) {
