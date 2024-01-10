@@ -11,7 +11,9 @@ import com.example.scanner.data.repo.ProjectRepository
 import com.example.scanner.ui.component.home.HomeMain
 import com.example.scanner.ui.theme.ScannerTheme
 import com.example.scanner.ui.viewmodel.HomeViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
