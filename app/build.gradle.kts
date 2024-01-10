@@ -2,9 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
 
-    kotlin("kapt")
     alias(libs.plugins.hiltPlugin)
-
     alias(libs.plugins.ksp)
 }
 
@@ -66,8 +64,7 @@ dependencies {
     implementation(libs.androidx.material3)
 
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-
+    ksp(libs.hilt.android.compiler)
 
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
@@ -81,8 +78,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-}
-
-kapt {
-    correctErrorTypes = true
 }
