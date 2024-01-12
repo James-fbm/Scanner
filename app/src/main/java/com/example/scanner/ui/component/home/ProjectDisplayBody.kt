@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.List
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TriStateCheckbox
@@ -19,15 +18,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
-import com.example.scanner.ui.viewmodel.ProjectListItemUiModel
+import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 
 @Composable
 fun ProjectDisplayBody(
-    allProjectListItemCheckedState: ToggleableState,
-    projectListItemUiModelList: List<ProjectListItemUiModel>,
-    onAllProjectListItemCheckedStateChanged: (ToggleableState) -> Unit,
-    onItemCheckedChanged: (ProjectListItemUiModel) -> Unit,
-    onMenuVisibleChanged: (ProjectListItemUiModel) -> Unit
+    allProjectItemCheckedState: ToggleableState,
+    projectItemUiModelList: List<ProjectItemUiModel>,
+    onAllProjectItemCheckedStateChanged: (ToggleableState) -> Unit,
+    onItemCheckedChanged: (ProjectItemUiModel) -> Unit,
+    onMenuVisibleChanged: (ProjectItemUiModel) -> Unit
 ) {
 
     // Select all checkbox and filter button on the top of the list
@@ -39,9 +38,9 @@ fun ProjectDisplayBody(
         horizontalArrangement = Arrangement.Center
     ) {
         TriStateCheckbox(
-            state = allProjectListItemCheckedState,
+            state = allProjectItemCheckedState,
             onClick = {
-                onAllProjectListItemCheckedStateChanged(allProjectListItemCheckedState)
+                onAllProjectItemCheckedStateChanged(allProjectItemCheckedState)
             })
         Spacer(modifier = Modifier.weight(1f))
         IconButton(
@@ -60,9 +59,9 @@ fun ProjectDisplayBody(
     LazyColumn(
         modifier = Modifier.fillMaxHeight()
     ) {
-        items(count = projectListItemUiModelList.size) { index ->
-            ProjectListItem (
-                projectListItemUiModel = projectListItemUiModelList[index],
+        items(count = projectItemUiModelList.size) { index ->
+            ProjectItem (
+                projectItemUiModel = projectItemUiModelList[index],
                 onItemCheckedChanged = onItemCheckedChanged,
                 onMenuVisibleChanged = onMenuVisibleChanged
             )

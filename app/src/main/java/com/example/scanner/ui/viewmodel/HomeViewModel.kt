@@ -23,14 +23,14 @@ class HomeViewModel @Inject constructor(
     fun getProjectList() {
         viewModelScope.launch(Dispatchers.IO) {
             _homeUiState.value = HomeUiState.Success(
-                allProjectListItemCheckedState = ToggleableState.Off,
-                enableProjectListItemDelete = false,
+                allProjectItemCheckedState = ToggleableState.Off,
+                projectItemDeleteEnabled = false,
                 topSearchBarUiModel = TopSearchBarUiModel(
                     false,
                     ""
                 ),
-                projectListItemUiModelList = projectRepository.getExampleProjectList().mapIndexed { index, entity ->
-                    ProjectListItemUiModel(
+                projectItemUiModelList = projectRepository.getExampleProjectList().mapIndexed { index, entity ->
+                    ProjectItemUiModel(
                         sequenceId = index,
                         projectName = entity.projectName,
                         modifyTime = entity.modifyTime,
@@ -46,8 +46,8 @@ class HomeViewModel @Inject constructor(
     // The following functions are called after _homeUiState.value is HomeUiState.Success
     // ----------------------------------------------------------------------------------
 
-    fun switchProjectListItemCheckedState
-                (projectListItemUiModel: ProjectListItemUiModel) {
+    fun switchProjectItemCheckedState
+                (projectItemUiModel: ProjectItemUiModel) {
 
         // remain the models of all other items
         // only change the checked status of the selected item
@@ -56,24 +56,24 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
 
             var newListToggleableState: ToggleableState = ToggleableState.Indeterminate
-            var enableItemDelete: Boolean = false
+            var itemDeleteEnabled: Boolean = false
             var checkedItemCount: Int = 0
 
             // update the list of the list item checked state by creating a new list object
 
             val newItemList = (_homeUiState.value as HomeUiState.Success)
-                .projectListItemUiModelList.map { model ->
-                    if (model.sequenceId == projectListItemUiModel.sequenceId) {
+                .projectItemUiModelList.map { model ->
+                    if (model.sequenceId == projectItemUiModel.sequenceId) {
                         if (!model.itemChecked) {
                             checkedItemCount += 1
-                            enableItemDelete = true
+                            itemDeleteEnabled = true
                         }
 
-                        model.copy(itemChecked = !projectListItemUiModel.itemChecked)
+                        model.copy(itemChecked = !projectItemUiModel.itemChecked)
                     } else {
                         if (model.itemChecked) {
                             checkedItemCount += 1
-                            enableItemDelete = true
+                            itemDeleteEnabled = true
                         }
 
                         model
@@ -83,7 +83,7 @@ class HomeViewModel @Inject constructor(
             // synchronize the checkbox state with the number of checked item
 
             if (checkedItemCount == (_homeUiState.value as HomeUiState.Success).
-                projectListItemUiModelList.size) {
+                projectItemUiModelList.size) {
                 newListToggleableState = ToggleableState.On
             }
 
@@ -92,46 +92,46 @@ class HomeViewModel @Inject constructor(
 
             _homeUiState.value = HomeUiState.Success(
                 newListToggleableState,
-                enableItemDelete,
+                itemDeleteEnabled,
                 (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
                 newItemList
             )
         }
     }
 
-    fun switchAllProjectListItemCheckedState(allProjectListItemCheckedState: ToggleableState) {
+    fun switchAllProjectItemCheckedState(allProjectItemCheckedState: ToggleableState) {
         viewModelScope.launch {
 
             var allItemChecked: Boolean = false
-            var enableItemDelete: Boolean = false
+            var itemDeleteEnabled: Boolean = false
             var newListToggleableState: ToggleableState = ToggleableState.Off
 
             // click a checkbox of `indeterminate` state will push it to `on` state
 
-            if (allProjectListItemCheckedState == ToggleableState.Indeterminate
-                || allProjectListItemCheckedState == ToggleableState.Off) {
+            if (allProjectItemCheckedState == ToggleableState.Indeterminate
+                || allProjectItemCheckedState == ToggleableState.Off) {
                 allItemChecked = true
-                enableItemDelete = true
+                itemDeleteEnabled = true
                 newListToggleableState = ToggleableState.On
             }
 
             // update the list of the list item checked state by creating a new list object
 
             val newItemList = (_homeUiState.value as HomeUiState.Success)
-                .projectListItemUiModelList.map { model ->
+                .projectItemUiModelList.map { model ->
                         model.copy(itemChecked = allItemChecked)
                 }
 
             _homeUiState.value = HomeUiState.Success(
                 newListToggleableState,
-                enableItemDelete,
+                itemDeleteEnabled,
                 (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
                 newItemList
             )
         }
     }
 
-    fun switchProjectListItemMenuVisibility(projectListItemUiModel: ProjectListItemUiModel) {
+    fun switchProjectItemMenuVisibility(projectItemUiModel: ProjectItemUiModel) {
 
         // remain the models of all other items
         // only change the menu visibility state of the selected item
@@ -142,16 +142,16 @@ class HomeViewModel @Inject constructor(
             // update the list of the list item checked state by creating a new list object
 
             val newItemList = (_homeUiState.value as HomeUiState.Success)
-                .projectListItemUiModelList.map { model ->
-                    if (model.sequenceId == projectListItemUiModel.sequenceId) {
-                        model.copy(menuVisible = !projectListItemUiModel.menuVisible)
+                .projectItemUiModelList.map { model ->
+                    if (model.sequenceId == projectItemUiModel.sequenceId) {
+                        model.copy(menuVisible = !projectItemUiModel.menuVisible)
                     } else {
                         model
                     }
                 }
             _homeUiState.value = HomeUiState.Success(
-                (_homeUiState.value as HomeUiState.Success).allProjectListItemCheckedState,
-                (_homeUiState.value as HomeUiState.Success).enableProjectListItemDelete,
+                (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
+                (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
                 (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
                 newItemList
             )
@@ -167,10 +167,10 @@ class HomeViewModel @Inject constructor(
             )
 
             _homeUiState.value = HomeUiState.Success(
-                (_homeUiState.value as HomeUiState.Success).allProjectListItemCheckedState,
-                (_homeUiState.value as HomeUiState.Success).enableProjectListItemDelete,
+                (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
+                (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
                 newSearchBarUiModel,
-                (_homeUiState.value as HomeUiState.Success).projectListItemUiModelList
+                (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
             )
         }
     }
@@ -184,17 +184,17 @@ class HomeViewModel @Inject constructor(
             )
 
             _homeUiState.value = HomeUiState.Success(
-                (_homeUiState.value as HomeUiState.Success).allProjectListItemCheckedState,
-                (_homeUiState.value as HomeUiState.Success).enableProjectListItemDelete,
+                (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
+                (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
                 newSearchBarUiModel,
-                (_homeUiState.value as HomeUiState.Success).projectListItemUiModelList
+                (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
             )
         }
     }
 
 }
 
-data class ProjectListItemUiModel (
+data class ProjectItemUiModel (
     val sequenceId: Int,
     val projectName: String,
     val modifyTime: String,
@@ -209,10 +209,10 @@ data class TopSearchBarUiModel (
 
 sealed class HomeUiState {
     data class Success (
-        val allProjectListItemCheckedState: ToggleableState,
-        val enableProjectListItemDelete: Boolean,
+        val allProjectItemCheckedState: ToggleableState,
+        val projectItemDeleteEnabled: Boolean,
         val topSearchBarUiModel: TopSearchBarUiModel,
-        val projectListItemUiModelList: List<ProjectListItemUiModel>
+        val projectItemUiModelList: List<ProjectItemUiModel>
     ): HomeUiState()
     data object Loading: HomeUiState()
     data object Error: HomeUiState()

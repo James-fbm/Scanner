@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BottomButtonGroup(
-    enableProjectListItemDelete: Boolean
+    projectItemDeleteEnabled: Boolean
 ) {
     BottomAppBar {
         Row ( modifier = Modifier
@@ -31,7 +31,7 @@ fun BottomButtonGroup(
             horizontalArrangement = Arrangement.Center
         ) {
             IconButton(
-                enabled = enableProjectListItemDelete,
+                enabled = projectItemDeleteEnabled,
                 onClick = { /* do something */ }
             ) {
                 Icon(Icons.Filled.Delete, contentDescription = null)

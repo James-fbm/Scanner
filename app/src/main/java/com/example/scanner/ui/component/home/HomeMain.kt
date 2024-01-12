@@ -42,8 +42,8 @@ fun HomeMain(
                 },
                 bottomBar = {
                     BottomButtonGroup(
-                        enableProjectListItemDelete =
-                        (homeUiState as HomeUiState.Success).enableProjectListItemDelete
+                        projectItemDeleteEnabled =
+                        (homeUiState as HomeUiState.Success).projectItemDeleteEnabled
                     )
                 }
             ) {innerPadding ->
@@ -52,16 +52,16 @@ fun HomeMain(
                     modifier = Modifier.padding(innerPadding).padding(top = 12.dp)
                 ) {
                     ProjectDisplayBody(
-                        allProjectListItemCheckedState = (homeUiState as HomeUiState.Success).allProjectListItemCheckedState,
-                        projectListItemUiModelList = (homeUiState as HomeUiState.Success).projectListItemUiModelList,
-                        onAllProjectListItemCheckedStateChanged = {checkedState ->
-                            homeViewModel.switchAllProjectListItemCheckedState(checkedState)
+                        allProjectItemCheckedState = (homeUiState as HomeUiState.Success).allProjectItemCheckedState,
+                        projectItemUiModelList = (homeUiState as HomeUiState.Success).projectItemUiModelList,
+                        onAllProjectItemCheckedStateChanged = { checkedState ->
+                            homeViewModel.switchAllProjectItemCheckedState(checkedState)
                         },
-                        onItemCheckedChanged = { projectListItemUiModel ->
-                            homeViewModel.switchProjectListItemCheckedState(projectListItemUiModel)
+                        onItemCheckedChanged = { projectItemUiModel ->
+                            homeViewModel.switchProjectItemCheckedState(projectItemUiModel)
                         },
-                        onMenuVisibleChanged = { projectListItemUiModel ->
-                            homeViewModel.switchProjectListItemMenuVisibility(projectListItemUiModel)
+                        onMenuVisibleChanged = { projectItemUiModel ->
+                            homeViewModel.switchProjectItemMenuVisibility(projectItemUiModel)
                         }
                     )
                 }

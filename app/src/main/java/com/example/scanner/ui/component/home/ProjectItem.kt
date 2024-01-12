@@ -22,20 +22,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.scanner.ui.viewmodel.ProjectListItemUiModel
+import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 
 @Composable
-fun ProjectListItem (
-    projectListItemUiModel: ProjectListItemUiModel,
-    onItemCheckedChanged: (ProjectListItemUiModel) -> Unit,
-    onMenuVisibleChanged: (ProjectListItemUiModel) -> Unit
+fun ProjectItem (
+    projectItemUiModel: ProjectItemUiModel,
+    onItemCheckedChanged: (ProjectItemUiModel) -> Unit,
+    onMenuVisibleChanged: (ProjectItemUiModel) -> Unit
 ) {
     ListItem(
         modifier = Modifier.clickable {
 
         },
         headlineContent = {
-            Text(projectListItemUiModel.projectName)
+            Text(projectItemUiModel.projectName)
         },
         supportingContent = {
             Spacer(modifier = Modifier.height(8.dp))
@@ -49,7 +49,7 @@ fun ProjectListItem (
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = projectListItemUiModel.modifyTime,
+                    text = projectItemUiModel.modifyTime,
                     color = Color.Gray,
                     fontSize = 12.sp
                 )
@@ -57,16 +57,16 @@ fun ProjectListItem (
         },
         leadingContent = {
             Checkbox(
-                checked = projectListItemUiModel.itemChecked,
+                checked = projectItemUiModel.itemChecked,
                 onCheckedChange = {
-                    onItemCheckedChanged(projectListItemUiModel)
+                    onItemCheckedChanged(projectItemUiModel)
                 }
             )
         },
         trailingContent = {
             IconButton(
                 onClick = {
-                    onMenuVisibleChanged(projectListItemUiModel)
+                    onMenuVisibleChanged(projectItemUiModel)
                 }
             ) {
                 Icon(
@@ -74,15 +74,15 @@ fun ProjectListItem (
                     contentDescription = null
                 )
                 DropdownMenu(
-                    expanded = projectListItemUiModel.menuVisible,
+                    expanded = projectItemUiModel.menuVisible,
                     onDismissRequest = {
-                        onMenuVisibleChanged(projectListItemUiModel)
+                        onMenuVisibleChanged(projectItemUiModel)
                     }
                 ) {
                     DropdownMenuItem(
                         text = { Text("Menu Item 1") },
                         onClick = {
-                            onMenuVisibleChanged(projectListItemUiModel)
+                            onMenuVisibleChanged(projectItemUiModel)
                         }
                     )
                     // Add more items as needed
@@ -94,15 +94,15 @@ fun ProjectListItem (
 
 @Preview
 @Composable
-fun ProjectListItemPreview() {
-    val projectListItemUiModel: ProjectListItemUiModel = ProjectListItemUiModel (
+fun ProjectItemPreview() {
+    val projectItemUiModel: ProjectItemUiModel = ProjectItemUiModel (
         1,
         "项目",
         "2024-01-02",
         false,
         true
     )
-    ProjectListItem (
-        projectListItemUiModel, {}, {}
+    ProjectItem (
+        projectItemUiModel, {}, {}
     )
 }
