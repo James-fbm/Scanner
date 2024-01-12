@@ -45,6 +45,10 @@ fun HomeMain(
                         projectItemDeleteEnabled =
                         (homeUiState as HomeUiState.Success).projectItemDeleteEnabled
                     )
+                    ProjectModifyDialog(
+                        null,
+                        {}
+                    )
                 }
             ) {innerPadding ->
                 Column(
