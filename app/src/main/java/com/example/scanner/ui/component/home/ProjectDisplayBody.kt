@@ -26,7 +26,8 @@ fun ProjectDisplayBody(
     projectItemUiModelList: List<ProjectItemUiModel>,
     onAllProjectItemCheckedStateChanged: (ToggleableState) -> Unit,
     onItemCheckedChanged: (ProjectItemUiModel) -> Unit,
-    onMenuVisibleChanged: (ProjectItemUiModel) -> Unit
+    onMenuVisibleChanged: (ProjectItemUiModel) -> Unit,
+    onEditDialogVisibleChanged: (ProjectItemUiModel) -> Unit
 ) {
 
     // Select all checkbox and filter button on the top of the list
@@ -63,7 +64,8 @@ fun ProjectDisplayBody(
             ProjectItem (
                 projectItemUiModel = projectItemUiModelList[index],
                 onItemCheckedChanged = onItemCheckedChanged,
-                onMenuVisibleChanged = onMenuVisibleChanged
+                onMenuVisibleChanged = onMenuVisibleChanged,
+                onEditDialogVisibleChanged = onEditDialogVisibleChanged
             )
             Spacer(modifier = Modifier.height(4.dp))
         }

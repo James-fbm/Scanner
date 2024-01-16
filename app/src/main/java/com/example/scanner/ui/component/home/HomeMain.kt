@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.scanner.ui.viewmodel.HomeUiState
 import com.example.scanner.ui.viewmodel.HomeViewModel
+import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 
 @Composable
 fun HomeMain(
@@ -45,10 +46,6 @@ fun HomeMain(
                         projectItemDeleteEnabled =
                         (homeUiState as HomeUiState.Success).projectItemDeleteEnabled
                     )
-                    ProjectModifyDialog(
-                        null,
-                        {}
-                    )
                 }
             ) {innerPadding ->
                 Column(
@@ -66,6 +63,9 @@ fun HomeMain(
                         },
                         onMenuVisibleChanged = { projectItemUiModel ->
                             homeViewModel.switchProjectItemMenuVisibility(projectItemUiModel)
+                        },
+                        onEditDialogVisibleChanged = {projectItemUiModel ->  
+                            homeViewModel.switchProjectEditDialogVisibility(projectItemUiModel)
                         }
                     )
                 }

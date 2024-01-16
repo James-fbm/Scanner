@@ -28,8 +28,14 @@ import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 fun ProjectItem (
     projectItemUiModel: ProjectItemUiModel,
     onItemCheckedChanged: (ProjectItemUiModel) -> Unit,
-    onMenuVisibleChanged: (ProjectItemUiModel) -> Unit
+    onMenuVisibleChanged: (ProjectItemUiModel) -> Unit,
+    onEditDialogVisibleChanged: (ProjectItemUiModel) -> Unit,
 ) {
+    ProjectEditDialog(
+        projectItemUiModel = projectItemUiModel
+    ) {
+        onEditDialogVisibleChanged(projectItemUiModel)
+    }
     ListItem(
         modifier = Modifier.clickable {
 
@@ -80,29 +86,19 @@ fun ProjectItem (
                     }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Menu Item 1") },
+                        text = { Text("Edit") },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Outlined.Edit,
+                                contentDescription = null
+                            )},
                         onClick = {
-                            onMenuVisibleChanged(projectItemUiModel)
+                            onEditDialogVisibleChanged(projectItemUiModel)
                         }
                     )
                     // Add more items as needed
                 }
             }
         }
-    )
-}
-
-@Preview
-@Composable
-fun ProjectItemPreview() {
-    val projectItemUiModel: ProjectItemUiModel = ProjectItemUiModel (
-        1,
-        "项目",
-        "2024-01-02",
-        false,
-        true
-    )
-    ProjectItem (
-        projectItemUiModel, {}, {}
     )
 }

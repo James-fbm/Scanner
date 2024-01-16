@@ -35,7 +35,8 @@ class HomeViewModel @Inject constructor(
                         projectName = entity.projectName,
                         modifyTime = entity.modifyTime,
                         itemChecked = false,
-                        menuVisible = false
+                        menuVisible = false,
+                        editDialogVisible = false
                     )
                 }
             )
@@ -139,8 +140,6 @@ class HomeViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            // update the list of the list item checked state by creating a new list object
-
             val newItemList = (_homeUiState.value as HomeUiState.Success)
                 .projectItemUiModelList.map { model ->
                     if (model.sequenceId == projectItemUiModel.sequenceId) {
@@ -192,6 +191,32 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun switchProjectEditDialogVisibility(projectItemUiModel: ProjectItemUiModel) {
+        viewModelScope.launch {
+
+            val newItemList = (_homeUiState.value as HomeUiState.Success)
+                .projectItemUiModelList.map { model ->
+                    if (model.sequenceId == projectItemUiModel.sequenceId) {
+                        model.copy(
+
+                            // ProjectEditDialog can be opened by menu item and can be closed by cancel button
+                            // Fold the menu after opening the dialog
+
+                            menuVisible = false,
+                            editDialogVisible = !projectItemUiModel.editDialogVisible
+                        )
+                    } else {
+                        model
+                    }
+                }
+            _homeUiState.value = HomeUiState.Success(
+                (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
+                (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
+                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                newItemList
+            )
+        }
+    }
 }
 
 data class ProjectItemUiModel (
@@ -199,7 +224,8 @@ data class ProjectItemUiModel (
     val projectName: String,
     val modifyTime: String,
     val itemChecked: Boolean,
-    val menuVisible: Boolean
+    val menuVisible: Boolean,
+    val editDialogVisible: Boolean,
 )
 
 data class TopSearchBarUiModel (
