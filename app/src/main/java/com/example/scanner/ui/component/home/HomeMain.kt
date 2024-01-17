@@ -54,6 +54,8 @@ fun HomeMain(
                 ) {
                     ProjectDisplayBody(
                         allProjectItemCheckedState = (homeUiState as HomeUiState.Success).allProjectItemCheckedState,
+                        projectAddUiModel = (homeUiState as HomeUiState.Success).projectAddUiModel,
+                        projectEditUiModel = (homeUiState as HomeUiState.Success).projectEditUiModel,
                         projectItemUiModelList = (homeUiState as HomeUiState.Success).projectItemUiModelList,
                         onAllProjectItemCheckedStateChanged = { checkedState ->
                             homeViewModel.switchAllProjectItemCheckedState(checkedState)

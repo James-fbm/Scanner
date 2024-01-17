@@ -18,17 +18,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
+import com.example.scanner.ui.viewmodel.ProjectAddUiModel
+import com.example.scanner.ui.viewmodel.ProjectEditUiModel
 import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 
 @Composable
 fun ProjectDisplayBody(
     allProjectItemCheckedState: ToggleableState,
+    projectAddUiModel: ProjectAddUiModel,
+    projectEditUiModel: ProjectEditUiModel,
     projectItemUiModelList: List<ProjectItemUiModel>,
     onAllProjectItemCheckedStateChanged: (ToggleableState) -> Unit,
     onItemCheckedChanged: (ProjectItemUiModel) -> Unit,
     onMenuVisibleChanged: (ProjectItemUiModel) -> Unit,
     onEditDialogVisibleChanged: (ProjectItemUiModel) -> Unit
 ) {
+    ProjectEditDialog(projectEditUiModel = projectEditUiModel) {
+        
+    }
+    
+    ProjectAddDialog(projectAddUiModel = projectAddUiModel) {
+        
+    }
 
     // Select all checkbox and filter button on the top of the list
 

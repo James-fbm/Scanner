@@ -31,11 +31,6 @@ fun ProjectItem (
     onMenuVisibleChanged: (ProjectItemUiModel) -> Unit,
     onEditDialogVisibleChanged: (ProjectItemUiModel) -> Unit,
 ) {
-    ProjectEditDialog(
-        projectItemUiModel = projectItemUiModel
-    ) {
-        onEditDialogVisibleChanged(projectItemUiModel)
-    }
     ListItem(
         modifier = Modifier.clickable {
 

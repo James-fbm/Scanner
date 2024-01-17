@@ -29,6 +29,20 @@ class HomeViewModel @Inject constructor(
                     false,
                     ""
                 ),
+                projectAddUiModel = ProjectAddUiModel(
+                    ProjectConfigureInfo(
+                        sequenceId = 0,
+                        projectName = ""
+                    ),
+                    false
+                ),
+                projectEditUiModel = ProjectEditUiModel(
+                    ProjectConfigureInfo(
+                        sequenceId = 0,
+                        projectName = ""
+                    ),
+                    false
+                ),
                 projectItemUiModelList = projectRepository.getExampleProjectList().mapIndexed { index, entity ->
                     ProjectItemUiModel(
                         sequenceId = index,
@@ -36,7 +50,6 @@ class HomeViewModel @Inject constructor(
                         modifyTime = entity.modifyTime,
                         itemChecked = false,
                         menuVisible = false,
-                        editDialogVisible = false
                     )
                 }
             )
@@ -95,6 +108,8 @@ class HomeViewModel @Inject constructor(
                 newListToggleableState,
                 itemDeleteEnabled,
                 (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
                 newItemList
             )
         }
@@ -127,6 +142,8 @@ class HomeViewModel @Inject constructor(
                 newListToggleableState,
                 itemDeleteEnabled,
                 (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
                 newItemList
             )
         }
@@ -152,6 +169,8 @@ class HomeViewModel @Inject constructor(
                 (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
                 (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
                 (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
                 newItemList
             )
         }
@@ -169,6 +188,8 @@ class HomeViewModel @Inject constructor(
                 (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
                 (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
                 newSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
             )
         }
@@ -186,6 +207,8 @@ class HomeViewModel @Inject constructor(
                 (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
                 (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
                 newSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
             )
         }
@@ -194,27 +217,7 @@ class HomeViewModel @Inject constructor(
     fun switchProjectEditDialogVisibility(projectItemUiModel: ProjectItemUiModel) {
         viewModelScope.launch {
 
-            val newItemList = (_homeUiState.value as HomeUiState.Success)
-                .projectItemUiModelList.map { model ->
-                    if (model.sequenceId == projectItemUiModel.sequenceId) {
-                        model.copy(
 
-                            // ProjectEditDialog can be opened by menu item and can be closed by cancel button
-                            // Fold the menu after opening the dialog
-
-                            menuVisible = false,
-                            editDialogVisible = !projectItemUiModel.editDialogVisible
-                        )
-                    } else {
-                        model
-                    }
-                }
-            _homeUiState.value = HomeUiState.Success(
-                (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
-                (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
-                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
-                newItemList
-            )
         }
     }
 }
@@ -224,8 +227,7 @@ data class ProjectItemUiModel (
     val projectName: String,
     val modifyTime: String,
     val itemChecked: Boolean,
-    val menuVisible: Boolean,
-    val editDialogVisible: Boolean,
+    val menuVisible: Boolean
 )
 
 data class TopSearchBarUiModel (
@@ -233,11 +235,30 @@ data class TopSearchBarUiModel (
     val inputQuery: String
 )
 
+// represent the part of the attributes that users can configure
+// used in adding and editing project functions
+data class ProjectConfigureInfo (
+    val sequenceId: Int,
+    val projectName: String
+)
+
+data class ProjectAddUiModel (
+    val configureInfo: ProjectConfigureInfo,
+    val dialogVisible: Boolean
+)
+
+data class ProjectEditUiModel (
+    val configureInfo: ProjectConfigureInfo,
+    val dialogVisible: Boolean
+)
+
 sealed class HomeUiState {
     data class Success (
         val allProjectItemCheckedState: ToggleableState,
         val projectItemDeleteEnabled: Boolean,
         val topSearchBarUiModel: TopSearchBarUiModel,
+        val projectAddUiModel: ProjectAddUiModel,
+        val projectEditUiModel: ProjectEditUiModel,
         val projectItemUiModelList: List<ProjectItemUiModel>
     ): HomeUiState()
     data object Loading: HomeUiState()

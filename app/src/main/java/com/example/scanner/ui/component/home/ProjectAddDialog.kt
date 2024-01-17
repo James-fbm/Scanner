@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -19,20 +18,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.scanner.ui.viewmodel.ProjectConfigureInfo
-import com.example.scanner.ui.viewmodel.ProjectEditUiModel
+import com.example.scanner.ui.viewmodel.ProjectAddUiModel
 import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 
-// ModalBottomSheet has trouble with keyboard imePadding. DO NOT USE IT.
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProjectEditDialog(
-    projectEditUiModel: ProjectEditUiModel,
-    onDialogVisibleChanged: (ProjectItemUiModel) -> Unit,
+fun ProjectAddDialog(
+    projectAddUiModel: ProjectAddUiModel,
+    onDialogVisibleChanged: (ProjectItemUiModel) -> Unit
 ) {
-
-    if (projectEditUiModel.dialogVisible) {
-        Dialog (
+    if (projectAddUiModel.dialogVisible) {
+        Dialog(
             onDismissRequest = { },
         ) {
             Card(
@@ -43,11 +38,9 @@ fun ProjectEditDialog(
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Text(
-                    text = "Edit Project",
+                    text = "New Project",
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .align(Alignment.CenterHorizontally)
+                    modifier = Modifier.padding(top = 16.dp).align(Alignment.CenterHorizontally)
                 )
 
                 OutlinedTextField(
@@ -56,16 +49,14 @@ fun ProjectEditDialog(
                     label = { Text("Name") },
                     singleLine = true,
                     placeholder = {
-                        Text(projectEditUiModel.configureInfo.projectName)
+                        Text("")
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 )
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(
