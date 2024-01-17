@@ -24,7 +24,7 @@ import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 @Composable
 fun ProjectAddDialog(
     projectAddUiModel: ProjectAddUiModel,
-    onDialogVisibleChanged: (ProjectItemUiModel) -> Unit
+    onDialogVisibleChanged: () -> Unit
 ) {
     if (projectAddUiModel.dialogVisible) {
         Dialog(
@@ -61,7 +61,7 @@ fun ProjectAddDialog(
                 ) {
                     TextButton(
                         onClick = {
-
+                            onDialogVisibleChanged()
                         }
                     ) {
                         Text("Cancel", style = MaterialTheme.typography.labelLarge)

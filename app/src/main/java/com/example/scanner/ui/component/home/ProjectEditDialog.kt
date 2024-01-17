@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.scanner.ui.viewmodel.ProjectConfigureInfo
 import com.example.scanner.ui.viewmodel.ProjectEditUiModel
 import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 
@@ -28,7 +27,10 @@ import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 @Composable
 fun ProjectEditDialog(
     projectEditUiModel: ProjectEditUiModel,
-    onDialogVisibleChanged: (ProjectItemUiModel) -> Unit,
+
+    // share the same visible change function with project item button
+    // we do not have and also do not need ProjectItemUiModel. This is just a declaration
+    onDialogVisibleChanged: (ProjectItemUiModel?) -> Unit,
 ) {
 
     if (projectEditUiModel.dialogVisible) {
@@ -56,7 +58,7 @@ fun ProjectEditDialog(
                     label = { Text("Name") },
                     singleLine = true,
                     placeholder = {
-                        Text(projectEditUiModel.configureInfo.projectName)
+                        Text(projectEditUiModel.projectName)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -70,7 +72,7 @@ fun ProjectEditDialog(
                 ) {
                     TextButton(
                         onClick = {
-
+                            onDialogVisibleChanged(null)
                         }
                     ) {
                         Text("Cancel", style = MaterialTheme.typography.labelLarge)

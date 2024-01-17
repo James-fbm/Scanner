@@ -31,14 +31,15 @@ fun ProjectDisplayBody(
     onAllProjectItemCheckedStateChanged: (ToggleableState) -> Unit,
     onItemCheckedChanged: (ProjectItemUiModel) -> Unit,
     onMenuVisibleChanged: (ProjectItemUiModel) -> Unit,
-    onEditDialogVisibleChanged: (ProjectItemUiModel) -> Unit
+    onEditDialogVisibleChanged: (ProjectItemUiModel?) -> Unit,
+    onAddDialogVisibleChanged: () -> Unit
 ) {
-    ProjectEditDialog(projectEditUiModel = projectEditUiModel) {
-        
+    ProjectEditDialog(projectEditUiModel = projectEditUiModel) { projectItemUiModel ->
+        onEditDialogVisibleChanged(projectItemUiModel)
     }
     
     ProjectAddDialog(projectAddUiModel = projectAddUiModel) {
-        
+        onAddDialogVisibleChanged()
     }
 
     // Select all checkbox and filter button on the top of the list

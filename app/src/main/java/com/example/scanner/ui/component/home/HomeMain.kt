@@ -44,7 +44,10 @@ fun HomeMain(
                 bottomBar = {
                     BottomButtonGroup(
                         projectItemDeleteEnabled =
-                        (homeUiState as HomeUiState.Success).projectItemDeleteEnabled
+                        (homeUiState as HomeUiState.Success).projectItemDeleteEnabled,
+                        onAddDialogVisibleChanged = {
+                            homeViewModel.switchProjectAddDialogVisibility()
+                        }
                     )
                 }
             ) {innerPadding ->
@@ -68,6 +71,9 @@ fun HomeMain(
                         },
                         onEditDialogVisibleChanged = {projectItemUiModel ->  
                             homeViewModel.switchProjectEditDialogVisibility(projectItemUiModel)
+                        },
+                        onAddDialogVisibleChanged = {
+                            homeViewModel.switchProjectAddDialogVisibility()
                         }
                     )
                 }

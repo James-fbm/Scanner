@@ -30,17 +30,12 @@ class HomeViewModel @Inject constructor(
                     ""
                 ),
                 projectAddUiModel = ProjectAddUiModel(
-                    ProjectConfigureInfo(
-                        sequenceId = 0,
-                        projectName = ""
-                    ),
+                    "",
                     false
                 ),
                 projectEditUiModel = ProjectEditUiModel(
-                    ProjectConfigureInfo(
-                        sequenceId = 0,
-                        projectName = ""
-                    ),
+                    0,
+                    "",
                     false
                 ),
                 projectItemUiModelList = projectRepository.getExampleProjectList().mapIndexed { index, entity ->
@@ -196,6 +191,10 @@ class HomeViewModel @Inject constructor(
     }
 
     fun updateTopSearchBarInput(inputQuery: String) {
+
+        // we maintain all the ui state in this ViewModel class
+        // so we change the inputQuery here instead of within the TopNavigator component
+
         viewModelScope.launch {
 
             val newSearchBarUiModel = TopSearchBarUiModel (
@@ -214,10 +213,71 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun switchProjectEditDialogVisibility(projectItemUiModel: ProjectItemUiModel) {
+    fun switchProjectEditDialogVisibility(projectItemUiModel: ProjectItemUiModel?) {
+        viewModelScope.launch {
+            if (projectItemUiModel == null) {
+
+                // called by dialog cancel button
+                // clear all the input and close the dialog
+
+                val newEditUiModel = ProjectEditUiModel(
+                    sequenceId = 0,
+                    projectName = "",
+                    dialogVisible = false
+                )
+
+                _homeUiState.value = HomeUiState.Success(
+                    (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
+                    (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
+                    (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                    (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
+                    newEditUiModel,
+                    (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
+                )
+            } else {
+
+                // close the menu list
+
+                switchProjectItemMenuVisibility(projectItemUiModel)
+
+                // initialize the dialog default value according to projectItemUiModel
+
+                val newEditUiModel = ProjectEditUiModel(
+                    sequenceId = projectItemUiModel.sequenceId,
+                    projectName = projectItemUiModel.projectName,
+                    dialogVisible = true
+                )
+
+                _homeUiState.value = HomeUiState.Success(
+                    (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
+                    (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
+                    (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                    (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
+                    newEditUiModel,
+                    (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
+                )
+            }
+        }
+    }
+
+    fun switchProjectAddDialogVisibility() {
         viewModelScope.launch {
 
+            val currentAddUiModel = (_homeUiState.value as HomeUiState.Success).projectAddUiModel
 
+            val newAddUiModel = ProjectAddUiModel(
+                "",
+                !currentAddUiModel.dialogVisible
+            )
+
+            _homeUiState.value = HomeUiState.Success(
+                (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
+                (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
+                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                newAddUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
+            )
         }
     }
 }
@@ -235,20 +295,14 @@ data class TopSearchBarUiModel (
     val inputQuery: String
 )
 
-// represent the part of the attributes that users can configure
-// used in adding and editing project functions
-data class ProjectConfigureInfo (
-    val sequenceId: Int,
-    val projectName: String
-)
-
 data class ProjectAddUiModel (
-    val configureInfo: ProjectConfigureInfo,
+    val projectName: String,
     val dialogVisible: Boolean
 )
 
 data class ProjectEditUiModel (
-    val configureInfo: ProjectConfigureInfo,
+    val sequenceId: Int,
+    val projectName: String,
     val dialogVisible: Boolean
 )
 

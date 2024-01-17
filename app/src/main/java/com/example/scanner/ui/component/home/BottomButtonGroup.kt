@@ -21,7 +21,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BottomButtonGroup(
-    projectItemDeleteEnabled: Boolean
+    projectItemDeleteEnabled: Boolean,
+    onAddDialogVisibleChanged: () -> Unit
 ) {
     BottomAppBar {
         Row ( modifier = Modifier
@@ -38,7 +39,7 @@ fun BottomButtonGroup(
             }
             Spacer(modifier = Modifier.weight(1f))
             FloatingActionButton(
-                onClick = { /* do something */ },
+                onClick = { onAddDialogVisibleChanged() },
                 containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                 elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
             ) {
