@@ -16,7 +16,8 @@ import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 
 @Composable
 fun HomeMain(
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    onProjectItemClicked: (Int) -> Unit
 ) {
     val homeUiState by homeViewModel.homeUiState.collectAsState()
     
@@ -60,6 +61,7 @@ fun HomeMain(
                         projectAddUiModel = (homeUiState as HomeUiState.Success).projectAddUiModel,
                         projectEditUiModel = (homeUiState as HomeUiState.Success).projectEditUiModel,
                         projectItemUiModelList = (homeUiState as HomeUiState.Success).projectItemUiModelList,
+                        onItemClicked = onProjectItemClicked,
                         onAllProjectItemCheckedStateChanged = { checkedState ->
                             homeViewModel.switchAllProjectItemCheckedState(checkedState)
                         },

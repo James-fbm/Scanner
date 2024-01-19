@@ -28,6 +28,7 @@ fun ProjectDisplayBody(
     projectAddUiModel: ProjectAddUiModel,
     projectEditUiModel: ProjectEditUiModel,
     projectItemUiModelList: List<ProjectItemUiModel>,
+    onItemClicked: (Int) -> Unit,
     onAllProjectItemCheckedStateChanged: (ToggleableState) -> Unit,
     onItemCheckedChanged: (ProjectItemUiModel) -> Unit,
     onMenuVisibleChanged: (ProjectItemUiModel) -> Unit,
@@ -75,6 +76,7 @@ fun ProjectDisplayBody(
         items(count = projectItemUiModelList.size) { index ->
             ProjectItem (
                 projectItemUiModel = projectItemUiModelList[index],
+                onItemClicked = onItemClicked,
                 onItemCheckedChanged = onItemCheckedChanged,
                 onMenuVisibleChanged = onMenuVisibleChanged,
                 onEditDialogVisibleChanged = onEditDialogVisibleChanged

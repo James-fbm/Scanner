@@ -38,9 +38,9 @@ class HomeViewModel @Inject constructor(
                     "",
                     false
                 ),
-                projectItemUiModelList = projectRepository.getExampleProjectList().mapIndexed { index, entity ->
+                projectItemUiModelList = projectRepository.getExampleProjectList().map { entity ->
                     ProjectItemUiModel(
-                        sequenceId = index,
+                        projectId = entity.projectId,
                         projectName = entity.projectName,
                         modifyTime = entity.modifyTime,
                         itemChecked = false,
@@ -72,7 +72,7 @@ class HomeViewModel @Inject constructor(
 
             val newItemList = (_homeUiState.value as HomeUiState.Success)
                 .projectItemUiModelList.map { model ->
-                    if (model.sequenceId == projectItemUiModel.sequenceId) {
+                    if (model.projectId == projectItemUiModel.projectId) {
                         if (!model.itemChecked) {
                             checkedItemCount += 1
                             itemDeleteEnabled = true
@@ -154,7 +154,7 @@ class HomeViewModel @Inject constructor(
 
             val newItemList = (_homeUiState.value as HomeUiState.Success)
                 .projectItemUiModelList.map { model ->
-                    if (model.sequenceId == projectItemUiModel.sequenceId) {
+                    if (model.projectId == projectItemUiModel.projectId) {
                         model.copy(menuVisible = !projectItemUiModel.menuVisible)
                     } else {
                         model
@@ -221,7 +221,7 @@ class HomeViewModel @Inject constructor(
                 // clear all the input and close the dialog
 
                 val newEditUiModel = ProjectEditUiModel(
-                    sequenceId = 0,
+                    projectId = 0,
                     projectName = "",
                     dialogVisible = false
                 )
@@ -243,7 +243,7 @@ class HomeViewModel @Inject constructor(
                 // initialize the dialog default value according to projectItemUiModel
 
                 val newEditUiModel = ProjectEditUiModel(
-                    sequenceId = projectItemUiModel.sequenceId,
+                    projectId = projectItemUiModel.projectId,
                     projectName = projectItemUiModel.projectName,
                     dialogVisible = true
                 )
@@ -283,7 +283,7 @@ class HomeViewModel @Inject constructor(
 }
 
 data class ProjectItemUiModel (
-    val sequenceId: Int,
+    val projectId: Int,
     val projectName: String,
     val modifyTime: String,
     val itemChecked: Boolean,
@@ -301,7 +301,7 @@ data class ProjectAddUiModel (
 )
 
 data class ProjectEditUiModel (
-    val sequenceId: Int,
+    val projectId: Int,
     val projectName: String,
     val dialogVisible: Boolean
 )

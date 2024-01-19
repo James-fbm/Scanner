@@ -27,13 +27,14 @@ import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 @Composable
 fun ProjectItem (
     projectItemUiModel: ProjectItemUiModel,
+    onItemClicked: (Int) -> Unit,
     onItemCheckedChanged: (ProjectItemUiModel) -> Unit,
     onMenuVisibleChanged: (ProjectItemUiModel) -> Unit,
     onEditDialogVisibleChanged: (ProjectItemUiModel) -> Unit,
 ) {
     ListItem(
         modifier = Modifier.clickable {
-
+            onItemClicked(projectItemUiModel.projectId)
         },
         headlineContent = {
             Text(projectItemUiModel.projectName)

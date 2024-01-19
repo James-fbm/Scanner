@@ -31,11 +31,6 @@ fun TopNavigator (
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(horizontal = 12.dp)
     ){
-        if (!topSearchBarUiModel.activeState) {
-            IconButton(onClick = {}) {
-                Icon(Icons.Outlined.ArrowBack, contentDescription = null)
-            }
-        }
         SearchBar(
             modifier = Modifier.fillMaxWidth(),
             active = topSearchBarUiModel.activeState,
@@ -61,13 +56,6 @@ fun TopNavigator (
                         Icon(Icons.Outlined.Clear, contentDescription = null)
                     }
                 }},
-            trailingIcon = {
-                IconButton(
-                    onClick = {}
-                ) {
-                    Icon(Icons.Outlined.Menu, contentDescription = null)
-                }
-            },
             query = topSearchBarUiModel.inputQuery
         ) {
 
