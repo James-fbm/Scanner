@@ -24,7 +24,9 @@ import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 @Composable
 fun ProjectAddDialog(
     projectAddUiModel: ProjectAddUiModel,
-    onDialogVisibleChanged: () -> Unit
+    onDialogProjectNameInputChanged: (String) -> Unit,
+    onDialogVisibleChanged: () -> Unit,
+    submitAddProject: (ProjectAddUiModel) -> Unit
 ) {
     if (projectAddUiModel.dialogVisible) {
         Dialog(
@@ -44,8 +46,10 @@ fun ProjectAddDialog(
                 )
 
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = projectAddUiModel.projectName,
+                    onValueChange = {input ->
+                        onDialogProjectNameInputChanged(input)
+                    },
                     label = { Text("Name") },
                     singleLine = true,
                     placeholder = {
@@ -71,7 +75,7 @@ fun ProjectAddDialog(
 
                     TextButton(
                         onClick = {
-
+                            submitAddProject(projectAddUiModel)
                         }
                     ) {
                         Text("OK", style = MaterialTheme.typography.labelLarge)

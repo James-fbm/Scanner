@@ -38,15 +38,7 @@ class HomeViewModel @Inject constructor(
                     "",
                     false
                 ),
-                projectItemUiModelList = projectRepository.getExampleProjectList().map { entity ->
-                    ProjectItemUiModel(
-                        projectId = entity.projectId,
-                        projectName = entity.projectName,
-                        modifyTime = entity.modifyTime,
-                        itemChecked = false,
-                        menuVisible = false,
-                    )
-                }
+                projectItemUiModelList = projectRepository.getAllProjectAsUiModel()
             )
         }
     }
@@ -280,6 +272,34 @@ class HomeViewModel @Inject constructor(
             )
         }
     }
+
+    fun updateAddDialogProjectNameInput(inputName: String) {
+        viewModelScope.launch {
+
+            val newProjectAddUiModel = ProjectAddUiModel(
+                inputName,
+                (_homeUiState.value as HomeUiState.Success).projectAddUiModel.dialogVisible
+            )
+
+            _homeUiState.value = HomeUiState.Success(
+                (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
+                (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
+                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                newProjectAddUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
+            )
+        }
+    }
+
+    fun submitAddProject(projectAddUiModel: ProjectAddUiModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            projectRepository.insertOneProjectFromUiModel(projectAddUiModel)
+            switchProjectAddDialogVisibility()
+            getProjectList()
+        }
+    }
+
 }
 
 data class ProjectItemUiModel (

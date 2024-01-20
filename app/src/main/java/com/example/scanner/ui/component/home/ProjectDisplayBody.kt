@@ -18,30 +18,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
-import com.example.scanner.ui.viewmodel.ProjectAddUiModel
-import com.example.scanner.ui.viewmodel.ProjectEditUiModel
 import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 
 @Composable
 fun ProjectDisplayBody(
     allProjectItemCheckedState: ToggleableState,
-    projectAddUiModel: ProjectAddUiModel,
-    projectEditUiModel: ProjectEditUiModel,
     projectItemUiModelList: List<ProjectItemUiModel>,
     onItemClicked: (Int) -> Unit,
-    onAllProjectItemCheckedStateChanged: (ToggleableState) -> Unit,
+    onAllItemCheckedStateChanged: (ToggleableState) -> Unit,
     onItemCheckedChanged: (ProjectItemUiModel) -> Unit,
     onMenuVisibleChanged: (ProjectItemUiModel) -> Unit,
     onEditDialogVisibleChanged: (ProjectItemUiModel?) -> Unit,
-    onAddDialogVisibleChanged: () -> Unit
 ) {
-    ProjectEditDialog(projectEditUiModel = projectEditUiModel) { projectItemUiModel ->
-        onEditDialogVisibleChanged(projectItemUiModel)
-    }
-    
-    ProjectAddDialog(projectAddUiModel = projectAddUiModel) {
-        onAddDialogVisibleChanged()
-    }
 
     // Select all checkbox and filter button on the top of the list
 
@@ -54,7 +42,7 @@ fun ProjectDisplayBody(
         TriStateCheckbox(
             state = allProjectItemCheckedState,
             onClick = {
-                onAllProjectItemCheckedStateChanged(allProjectItemCheckedState)
+                onAllItemCheckedStateChanged(allProjectItemCheckedState)
             })
         Spacer(modifier = Modifier.weight(1f))
         IconButton(

@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.scanner.ui.viewmodel.HomeUiState
 import com.example.scanner.ui.viewmodel.HomeViewModel
-import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 
 @Composable
 fun HomeMain(
@@ -54,15 +53,15 @@ fun HomeMain(
             ) {innerPadding ->
                 Column(
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(innerPadding).padding(top = 12.dp)
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .padding(top = 12.dp)
                 ) {
                     ProjectDisplayBody(
                         allProjectItemCheckedState = (homeUiState as HomeUiState.Success).allProjectItemCheckedState,
-                        projectAddUiModel = (homeUiState as HomeUiState.Success).projectAddUiModel,
-                        projectEditUiModel = (homeUiState as HomeUiState.Success).projectEditUiModel,
                         projectItemUiModelList = (homeUiState as HomeUiState.Success).projectItemUiModelList,
                         onItemClicked = onProjectItemClicked,
-                        onAllProjectItemCheckedStateChanged = { checkedState ->
+                        onAllItemCheckedStateChanged = { checkedState ->
                             homeViewModel.switchAllProjectItemCheckedState(checkedState)
                         },
                         onItemCheckedChanged = { projectItemUiModel ->
@@ -71,11 +70,26 @@ fun HomeMain(
                         onMenuVisibleChanged = { projectItemUiModel ->
                             homeViewModel.switchProjectItemMenuVisibility(projectItemUiModel)
                         },
-                        onEditDialogVisibleChanged = {projectItemUiModel ->  
+                        onEditDialogVisibleChanged = {projectItemUiModel ->
                             homeViewModel.switchProjectEditDialogVisibility(projectItemUiModel)
-                        },
-                        onAddDialogVisibleChanged = {
+                        }
+                    )
+
+                    ProjectEditDialog(projectEditUiModel = (homeUiState as HomeUiState.Success)
+                        .projectEditUiModel,) { projectItemUiModel ->
+                        homeViewModel.switchProjectEditDialogVisibility(projectItemUiModel)
+                    }
+
+                    ProjectAddDialog(
+                        projectAddUiModel = (homeUiState as HomeUiState.Success).projectAddUiModel,
+                        onDialogVisibleChanged = {
                             homeViewModel.switchProjectAddDialogVisibility()
+                        },
+                        onDialogProjectNameInputChanged = {inputName ->
+                            homeViewModel.updateAddDialogProjectNameInput(inputName)
+                        },
+                        submitAddProject = {projectAddUiModel ->
+                            homeViewModel.submitAddProject(projectAddUiModel)
                         }
                     )
                 }

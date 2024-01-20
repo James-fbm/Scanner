@@ -30,7 +30,7 @@ fun ProjectItem (
     onItemClicked: (Int) -> Unit,
     onItemCheckedChanged: (ProjectItemUiModel) -> Unit,
     onMenuVisibleChanged: (ProjectItemUiModel) -> Unit,
-    onEditDialogVisibleChanged: (ProjectItemUiModel) -> Unit,
+    onEditDialogVisibleChanged: (ProjectItemUiModel?) -> Unit,
 ) {
     ListItem(
         modifier = Modifier.clickable {

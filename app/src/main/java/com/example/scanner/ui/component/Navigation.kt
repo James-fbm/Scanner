@@ -1,13 +1,11 @@
-package com.example.scanner
+package com.example.scanner.ui.component
 
-import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.scanner.ui.component.home.HomeMain
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.navArgument
 import com.example.scanner.ui.component.start.StartMain
 
 @Composable

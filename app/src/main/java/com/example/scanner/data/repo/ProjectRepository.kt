@@ -2,24 +2,57 @@ package com.example.scanner.data.repo
 
 import com.example.scanner.data.dao.ProjectDao
 import com.example.scanner.data.entity.ProjectEntity
+import com.example.scanner.ui.viewmodel.ProjectAddUiModel
+import com.example.scanner.ui.viewmodel.ProjectItemUiModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 class ProjectRepository @Inject constructor(
     private val projectDao: ProjectDao
 ) {
-    fun getExampleProjectList(): List<ProjectEntity> {
-        val projectEntityList = mutableListOf<ProjectEntity>()
+    fun getExampleProjectItemUiModelList(): List<ProjectItemUiModel> {
+        val projectEntityList = mutableListOf<ProjectItemUiModel>()
         for (i in 1..10) {
+            val projectId = i
             val projectName = "项目$i"
-            val startDate = "2022-${String.format("%02d", i % 12 + 1)}-01" // 格式化月份，确保始终是两位数
-            val endDate = "2022-${String.format("%02d", i % 12 + 1)}-02" // 使用i的模运算来循环生成月份
-            projectEntityList.add(ProjectEntity(i, projectName, startDate, endDate))
+            val itemChecked = false
+            // val createTime = "2022-${String.format("%02d", i % 12 + 1)}-01"
+            val modifyTime = "2022-${String.format("%02d", i % 12 + 1)}-02"
+            val menuVisible = false
+            projectEntityList.add(ProjectItemUiModel(projectId, projectName, modifyTime, itemChecked, menuVisible))
         }
 
         return projectEntityList
     }
 
-    suspend fun getAllProject(): List<ProjectEntity> {
-        return projectDao.getAll()
+    suspend fun getAllProjectAsUiModel(): List<ProjectItemUiModel> {
+        val entityList = projectDao.getAll()
+        return entityList.map {entity ->
+            ProjectItemUiModel(
+                projectId = entity.projectId,
+                projectName = entity.projectName,
+                modifyTime = formatDate(entity.modifyTime),
+                itemChecked = false,
+                menuVisible = false
+            )
+        }
     }
+
+    suspend fun insertOneProjectFromUiModel(projectAddUiModel: ProjectAddUiModel) {
+        val projectEntity = ProjectEntity(
+            // will be ignored
+            projectId = 0,
+            projectName = projectAddUiModel.projectName,
+            createTime = Date(),
+            modifyTime = Date()
+        )
+        projectDao.insertOne(projectEntity)
+    }
+}
+
+fun formatDate(date: Date): String {
+    val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    return formatter.format(date)
 }
