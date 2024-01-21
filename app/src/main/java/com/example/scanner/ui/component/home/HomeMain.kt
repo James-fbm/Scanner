@@ -78,10 +78,18 @@ fun HomeMain(
                         }
                     )
 
-                    ProjectEditDialog(projectEditUiModel = (homeUiState as HomeUiState.Success)
-                        .projectEditUiModel,) { projectItemUiModel ->
-                        homeViewModel.switchProjectEditDialogVisibility(projectItemUiModel)
-                    }
+                    ProjectEditDialog(
+                        projectEditUiModel = (homeUiState as HomeUiState.Success).projectEditUiModel,
+                        onDialogVisibleChanged = { projectItemUiModel ->
+                            homeViewModel.switchProjectEditDialogVisibility(projectItemUiModel)
+                        },
+                        onDialogProjectNameInputChanged = {inputName ->
+                            homeViewModel.updateEditDialogProjectNameInput(inputName)
+                        },
+                        onEditRequestSubmitted = {projectEditUiModel ->
+                            homeViewModel.submitUpdateProject(projectEditUiModel)
+                        }
+                    )
 
                     ProjectAddDialog(
                         projectAddUiModel = (homeUiState as HomeUiState.Success).projectAddUiModel,

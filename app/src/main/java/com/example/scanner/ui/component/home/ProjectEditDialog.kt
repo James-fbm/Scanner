@@ -31,6 +31,8 @@ fun ProjectEditDialog(
     // share the same visible change function with project item button
     // we do not have and also do not need ProjectItemUiModel. This is just a declaration
     onDialogVisibleChanged: (ProjectItemUiModel?) -> Unit,
+    onDialogProjectNameInputChanged: (String) -> Unit,
+    onEditRequestSubmitted: (ProjectEditUiModel) -> Unit
 ) {
 
     if (projectEditUiModel.dialogVisible) {
@@ -53,8 +55,10 @@ fun ProjectEditDialog(
                 )
 
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = projectEditUiModel.projectName,
+                    onValueChange = {inputName ->
+                        onDialogProjectNameInputChanged(inputName)
+                    },
                     label = { Text("Name") },
                     singleLine = true,
                     placeholder = {
@@ -82,7 +86,7 @@ fun ProjectEditDialog(
 
                     TextButton(
                         onClick = {
-
+                            onEditRequestSubmitted(projectEditUiModel)
                         }
                     ) {
                         Text("OK", style = MaterialTheme.typography.labelLarge)

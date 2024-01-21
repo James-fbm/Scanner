@@ -329,7 +329,29 @@ class HomeViewModel @Inject constructor(
     fun submitAddProject(projectAddUiModel: ProjectAddUiModel) {
         viewModelScope.launch(Dispatchers.IO) {
             projectRepository.insertOneProjectFromUiModel(projectAddUiModel)
-            switchProjectAddDialogVisibility()
+        }
+    }
+
+    fun updateEditDialogProjectNameInput(inputName: String) {
+        viewModelScope.launch {
+
+            val editUiModel = (_homeUiState.value as HomeUiState.Success).projectEditUiModel
+
+            val newEditUiModel = ProjectEditUiModel(
+                editUiModel.projectId,
+                inputName,
+                editUiModel.dialogVisible
+            )
+
+            _homeUiState.value = HomeUiState.Success(
+                (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
+                (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
+                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
+                newEditUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
+            )
         }
     }
 
@@ -339,11 +361,15 @@ class HomeViewModel @Inject constructor(
             projectRepository.deleteProjectFromUiModelList(
                 (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
             )
-
-            switchProjectDeleteDialogVisibility()
         }
     }
 
+    fun submitUpdateProject(projectEditUiModel: ProjectEditUiModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            projectRepository.updateProjectFromUiModel(projectEditUiModel)
+        }
+    }
 }
 
 data class ProjectItemUiModel (
