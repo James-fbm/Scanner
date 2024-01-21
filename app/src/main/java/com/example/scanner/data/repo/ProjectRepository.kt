@@ -3,6 +3,7 @@ package com.example.scanner.data.repo
 import androidx.compose.runtime.collectAsState
 import com.example.scanner.data.dao.ProjectDao
 import com.example.scanner.data.entity.ProjectEntity
+import com.example.scanner.ui.viewmodel.HomeUiState
 import com.example.scanner.ui.viewmodel.ProjectAddUiModel
 import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 import kotlinx.coroutines.flow.Flow
@@ -15,21 +16,6 @@ import javax.inject.Inject
 class ProjectRepository @Inject constructor(
     private val projectDao: ProjectDao
 ) {
-    fun getExampleProjectItemUiModelList(): List<ProjectItemUiModel> {
-        val projectEntityList = mutableListOf<ProjectItemUiModel>()
-        for (i in 1..10) {
-            val projectId = i
-            val projectName = "项目$i"
-            val itemChecked = false
-            // val createTime = "2022-${String.format("%02d", i % 12 + 1)}-01"
-            val modifyTime = "2022-${String.format("%02d", i % 12 + 1)}-02"
-            val menuVisible = false
-            projectEntityList.add(ProjectItemUiModel(projectId, projectName, modifyTime, itemChecked, menuVisible))
-        }
-
-        return projectEntityList
-    }
-
     suspend fun getAllProjectAsUiModel(): Flow<List<ProjectItemUiModel>> {
         return projectDao.getAll().map { entityList ->
             entityList.map { entity ->
@@ -54,7 +40,23 @@ class ProjectRepository @Inject constructor(
         )
         projectDao.insertOne(projectEntity)
     }
+
+    suspend fun deleteProjectFromUiModel(toDeleteItemUiModelList: List<ProjectItemUiModel>) {
+
+        val defaultDate = Date()
+
+        val toDeleteEntityList = toDeleteItemUiModelList
+            .filter { projectItemUiModel -> projectItemUiModel.itemChecked }
+            .map { projectItemUiModel -> ProjectEntity (
+                projectId = projectItemUiModel.projectId,
+                projectName = "",
+                createTime = defaultDate,
+                modifyTime = defaultDate,
+            ) }
+        projectDao.deleteByEntityList(toDeleteEntityList)
+    }
 }
+
 
 fun formatDate(date: Date): String {
     val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())

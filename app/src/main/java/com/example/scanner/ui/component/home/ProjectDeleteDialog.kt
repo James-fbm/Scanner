@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -18,17 +17,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.scanner.ui.viewmodel.ProjectAddUiModel
+import com.example.scanner.ui.viewmodel.ProjectDeleteUiModel
+
 
 @Composable
-fun ProjectAddDialog(
-    projectAddUiModel: ProjectAddUiModel,
-    onDialogProjectNameInputChanged: (String) -> Unit,
+fun ProjectDeleteDialog(
+    projectDeleteUiModel: ProjectDeleteUiModel,
     onDialogVisibleChanged: () -> Unit,
-    onAddRequestSubmitted: (ProjectAddUiModel) -> Unit
+    onDeleteRequestSubmitted: () -> Unit
 ) {
-    if (projectAddUiModel.dialogVisible) {
-        Dialog(
+    if (projectDeleteUiModel.dialogVisible) {
+        Dialog (
             onDismissRequest = { },
         ) {
             Card(
@@ -39,27 +38,29 @@ fun ProjectAddDialog(
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Text(
-                    text = "New Project",
+                    text = "Delete Project",
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(top = 16.dp).align(Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .align(Alignment.CenterHorizontally)
                 )
 
-                OutlinedTextField(
-                    value = projectAddUiModel.projectName,
-                    onValueChange = {input ->
-                        onDialogProjectNameInputChanged(input)
-                    },
-                    label = { Text("Name") },
-                    singleLine = true,
-                    placeholder = {
-                        Text("")
-                    },
+                Text(
+                    text = "Deleting projects will also remove all contents within the projects.",
+                    modifier = Modifier
+                        .padding(top = 16.dp, start = 16.dp)
+                )
+
+                Text(
+                    text = "The action is irreversible.",
+                    modifier = Modifier
+                        .padding(top = 16.dp, start = 16.dp)
+                )
+
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                        .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(
@@ -74,7 +75,7 @@ fun ProjectAddDialog(
 
                     TextButton(
                         onClick = {
-                            onAddRequestSubmitted(projectAddUiModel)
+                            onDeleteRequestSubmitted()
                         }
                     ) {
                         Text("OK", style = MaterialTheme.typography.labelLarge)

@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,6 +39,9 @@ class HomeViewModel @Inject constructor(
                     projectEditUiModel = ProjectEditUiModel(
                         0,
                         "",
+                        false
+                    ),
+                    projectDeleteUiModel = ProjectDeleteUiModel(
                         false
                     ),
                     projectItemUiModelList = projectList
@@ -101,6 +105,7 @@ class HomeViewModel @Inject constructor(
                 (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
                 newItemList
             )
         }
@@ -135,6 +140,7 @@ class HomeViewModel @Inject constructor(
                 (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
                 newItemList
             )
         }
@@ -162,6 +168,7 @@ class HomeViewModel @Inject constructor(
                 (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
                 newItemList
             )
         }
@@ -181,6 +188,7 @@ class HomeViewModel @Inject constructor(
                 newSearchBarUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
             )
         }
@@ -204,6 +212,7 @@ class HomeViewModel @Inject constructor(
                 newSearchBarUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
             )
         }
@@ -228,6 +237,7 @@ class HomeViewModel @Inject constructor(
                     (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
                     (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                     newEditUiModel,
+                    (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
                     (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
                 )
             } else {
@@ -250,6 +260,7 @@ class HomeViewModel @Inject constructor(
                     (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
                     (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                     newEditUiModel,
+                    (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
                     (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
                 )
             }
@@ -272,6 +283,26 @@ class HomeViewModel @Inject constructor(
                 (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
                 newAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
+            )
+        }
+    }
+
+    fun switchProjectDeleteDialogVisibility() {
+        viewModelScope.launch {
+
+            val newDeleteUiModel = ProjectDeleteUiModel (
+                !(_homeUiState.value as HomeUiState.Success).projectDeleteUiModel.dialogVisible
+            )
+
+            _homeUiState.value = HomeUiState.Success(
+                (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
+                (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
+                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
+                newDeleteUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
             )
         }
@@ -291,6 +322,7 @@ class HomeViewModel @Inject constructor(
                 (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
                 newProjectAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
+                (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
             )
         }
@@ -300,6 +332,17 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             projectRepository.insertOneProjectFromUiModel(projectAddUiModel)
             switchProjectAddDialogVisibility()
+        }
+    }
+
+    fun submitDeleteProject() {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            projectRepository.deleteProjectFromUiModel(
+                (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
+            )
+
+            switchProjectDeleteDialogVisibility()
         }
     }
 
@@ -329,6 +372,10 @@ data class ProjectEditUiModel (
     val dialogVisible: Boolean
 )
 
+data class ProjectDeleteUiModel (
+    val dialogVisible: Boolean
+)
+
 sealed class HomeUiState {
     data class Success (
         val allProjectItemCheckedState: ToggleableState,
@@ -336,6 +383,7 @@ sealed class HomeUiState {
         val topSearchBarUiModel: TopSearchBarUiModel,
         val projectAddUiModel: ProjectAddUiModel,
         val projectEditUiModel: ProjectEditUiModel,
+        val projectDeleteUiModel: ProjectDeleteUiModel,
         val projectItemUiModelList: List<ProjectItemUiModel>
     ): HomeUiState()
     data object Loading: HomeUiState()

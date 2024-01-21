@@ -47,6 +47,9 @@ fun HomeMain(
                         (homeUiState as HomeUiState.Success).projectItemDeleteEnabled,
                         onAddDialogVisibleChanged = {
                             homeViewModel.switchProjectAddDialogVisibility()
+                        },
+                        onDeleteDialogVisibleChanged = {
+                            homeViewModel.switchProjectDeleteDialogVisibility()
                         }
                     )
                 }
@@ -88,8 +91,18 @@ fun HomeMain(
                         onDialogProjectNameInputChanged = {inputName ->
                             homeViewModel.updateAddDialogProjectNameInput(inputName)
                         },
-                        submitAddProject = {projectAddUiModel ->
+                        onAddRequestSubmitted = { projectAddUiModel ->
                             homeViewModel.submitAddProject(projectAddUiModel)
+                        }
+                    )
+
+                    ProjectDeleteDialog(
+                        projectDeleteUiModel = (homeUiState as HomeUiState.Success).projectDeleteUiModel,
+                        onDialogVisibleChanged = {
+                            homeViewModel.switchProjectDeleteDialogVisibility()
+                        },
+                        onDeleteRequestSubmitted = {
+                            homeViewModel.submitDeleteProject()
                         }
                     )
                 }

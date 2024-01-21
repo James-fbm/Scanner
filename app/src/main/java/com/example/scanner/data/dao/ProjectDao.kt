@@ -1,6 +1,7 @@
 package com.example.scanner.data.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.scanner.data.entity.ProjectEntity
@@ -13,4 +14,7 @@ interface ProjectDao {
 
     @Insert
     suspend fun insertOne(projectEntity: ProjectEntity)
+
+    @Delete
+    suspend fun deleteByEntityList(entityList: List<ProjectEntity>)
 }
