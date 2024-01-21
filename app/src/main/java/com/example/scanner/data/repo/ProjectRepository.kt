@@ -1,9 +1,12 @@
 package com.example.scanner.data.repo
 
+import androidx.compose.runtime.collectAsState
 import com.example.scanner.data.dao.ProjectDao
 import com.example.scanner.data.entity.ProjectEntity
 import com.example.scanner.ui.viewmodel.ProjectAddUiModel
 import com.example.scanner.ui.viewmodel.ProjectItemUiModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -27,16 +30,17 @@ class ProjectRepository @Inject constructor(
         return projectEntityList
     }
 
-    suspend fun getAllProjectAsUiModel(): List<ProjectItemUiModel> {
-        val entityList = projectDao.getAll()
-        return entityList.map {entity ->
-            ProjectItemUiModel(
-                projectId = entity.projectId,
-                projectName = entity.projectName,
-                modifyTime = formatDate(entity.modifyTime),
-                itemChecked = false,
-                menuVisible = false
-            )
+    suspend fun getAllProjectAsUiModel(): Flow<List<ProjectItemUiModel>> {
+        return projectDao.getAll().map { entityList ->
+            entityList.map { entity ->
+                ProjectItemUiModel(
+                    projectId = entity.projectId,
+                    projectName = entity.projectName,
+                    modifyTime = formatDate(entity.modifyTime),
+                    itemChecked = false,
+                    menuVisible = false
+                )
+            }
         }
     }
 

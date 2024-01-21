@@ -1,5 +1,6 @@
 package com.example.scanner.ui.viewmodel
 
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.state.ToggleableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,24 +23,27 @@ class HomeViewModel @Inject constructor(
 
     fun getProjectList() {
         viewModelScope.launch(Dispatchers.IO) {
-            _homeUiState.value = HomeUiState.Success(
-                allProjectItemCheckedState = ToggleableState.Off,
-                projectItemDeleteEnabled = false,
-                topSearchBarUiModel = TopSearchBarUiModel(
-                    false,
-                    ""
-                ),
-                projectAddUiModel = ProjectAddUiModel(
-                    "",
-                    false
-                ),
-                projectEditUiModel = ProjectEditUiModel(
-                    0,
-                    "",
-                    false
-                ),
-                projectItemUiModelList = projectRepository.getAllProjectAsUiModel()
-            )
+            projectRepository.getAllProjectAsUiModel().collect { projectList ->
+                _homeUiState.value = HomeUiState.Success(
+                    allProjectItemCheckedState = ToggleableState.Off,
+                    projectItemDeleteEnabled = false,
+                    topSearchBarUiModel = TopSearchBarUiModel(
+                        false,
+                        ""
+                    ),
+                    projectAddUiModel = ProjectAddUiModel(
+                        "",
+                        false
+                    ),
+                    projectEditUiModel = ProjectEditUiModel(
+                        0,
+                        "",
+                        false
+                    ),
+                    projectItemUiModelList = projectList
+                )
+            }
+
         }
     }
 
@@ -296,7 +300,6 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             projectRepository.insertOneProjectFromUiModel(projectAddUiModel)
             switchProjectAddDialogVisibility()
-            getProjectList()
         }
     }
 
