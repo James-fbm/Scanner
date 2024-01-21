@@ -1,10 +1,9 @@
 package com.example.scanner.data.repo
 
-import androidx.compose.runtime.collectAsState
 import com.example.scanner.data.dao.ProjectDao
 import com.example.scanner.data.entity.ProjectEntity
-import com.example.scanner.ui.viewmodel.HomeUiState
 import com.example.scanner.ui.viewmodel.ProjectAddUiModel
+import com.example.scanner.ui.viewmodel.ProjectEditUiModel
 import com.example.scanner.ui.viewmodel.ProjectItemUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -16,6 +15,7 @@ import javax.inject.Inject
 class ProjectRepository @Inject constructor(
     private val projectDao: ProjectDao
 ) {
+
     suspend fun getAllProjectAsUiModel(): Flow<List<ProjectItemUiModel>> {
         return projectDao.getAll().map { entityList ->
             entityList.map { entity ->
@@ -32,7 +32,7 @@ class ProjectRepository @Inject constructor(
 
     suspend fun insertOneProjectFromUiModel(projectAddUiModel: ProjectAddUiModel) {
         val projectEntity = ProjectEntity(
-            // will be ignored
+            // id will be ignored here
             projectId = 0,
             projectName = projectAddUiModel.projectName,
             createTime = Date(),
@@ -41,19 +41,23 @@ class ProjectRepository @Inject constructor(
         projectDao.insertOne(projectEntity)
     }
 
-    suspend fun deleteProjectFromUiModel(toDeleteItemUiModelList: List<ProjectItemUiModel>) {
+    suspend fun deleteProjectFromUiModelList(toDeleteItemUiModelList: List<ProjectItemUiModel>) {
 
-        val defaultDate = Date()
+        // Only id(primary key) needs to be set. Other attributes are assigned with a default value.
 
-        val toDeleteEntityList = toDeleteItemUiModelList
+        val toDeleteIdList = toDeleteItemUiModelList
             .filter { projectItemUiModel -> projectItemUiModel.itemChecked }
-            .map { projectItemUiModel -> ProjectEntity (
-                projectId = projectItemUiModel.projectId,
-                projectName = "",
-                createTime = defaultDate,
-                modifyTime = defaultDate,
-            ) }
-        projectDao.deleteByEntityList(toDeleteEntityList)
+            .map { projectItemUiModel -> projectItemUiModel.projectId }
+
+        projectDao.deleteByIdList(toDeleteIdList)
+    }
+
+    suspend fun updateProjectFromUiModel(projectEditUiModel: ProjectEditUiModel) {
+
+        val projectId = projectEditUiModel.projectId
+        val projectName = projectEditUiModel.projectName
+        val modifyTime = Date()
+        projectDao.updateOne(projectId, projectName, modifyTime)
     }
 }
 
@@ -61,4 +65,9 @@ class ProjectRepository @Inject constructor(
 fun formatDate(date: Date): String {
     val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     return formatter.format(date)
+}
+
+fun makeDate(dateString: String): Date {
+    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    return sdf.parse(dateString) ?: throw IllegalArgumentException("Invalid date format")
 }

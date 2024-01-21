@@ -1,6 +1,5 @@
 package com.example.scanner.ui.viewmodel
 
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.state.ToggleableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +8,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -338,7 +336,7 @@ class HomeViewModel @Inject constructor(
     fun submitDeleteProject() {
         viewModelScope.launch(Dispatchers.IO) {
 
-            projectRepository.deleteProjectFromUiModel(
+            projectRepository.deleteProjectFromUiModelList(
                 (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
             )
 
