@@ -43,8 +43,6 @@ class ProjectRepository @Inject constructor(
 
     suspend fun deleteProjectFromUiModelList(toDeleteItemUiModelList: List<ProjectItemUiModel>) {
 
-        // Only id(primary key) needs to be set. Other attributes are assigned with a default value.
-
         val toDeleteIdList = toDeleteItemUiModelList
             .filter { projectItemUiModel -> projectItemUiModel.itemChecked }
             .map { projectItemUiModel -> projectItemUiModel.projectId }
