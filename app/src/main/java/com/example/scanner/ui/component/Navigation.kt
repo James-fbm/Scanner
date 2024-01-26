@@ -21,7 +21,7 @@ fun Navigation() {
 
         composable("start/{projectId}") {backStackEntry ->
             val projectId = backStackEntry.arguments?.getString("projectId")?.toInt()
-            StartMain(projectId)
+            StartMain()
         }
     }
 }
