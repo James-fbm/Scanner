@@ -15,6 +15,7 @@ lifecycleViewmodelCompose = "2.6.2"
 navigationVersion = "2.7.6"
 hiltNavigationVersion = "1.1.0"
 cameraxVersion = "1.4.0-alpha03"
+poiVersion = "5.2.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,9 @@ camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "
 camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "cameraxVersion" }
 camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraxVersion" }
 camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraxVersion" }
+
+apache-poi = { group = "org.apache.poi", name = "poi", version.ref = "poiVersion" }
+apache-poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "poiVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

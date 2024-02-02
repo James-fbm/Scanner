@@ -1,4 +1,4 @@
-package com.example.scanner.ui.component.start
+package com.example.scanner.ui.component.camera
 
 import android.os.Environment
 import android.view.ViewGroup

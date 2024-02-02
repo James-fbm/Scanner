@@ -1,12 +1,10 @@
 package com.example.scanner.di
 
-import android.app.Application
 import android.content.Context
-import androidx.camera.core.CameraSelector
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.room.Room
 import com.example.scanner.data.AppDatabase
 import com.example.scanner.data.dao.ProjectDao
+import com.example.scanner.data.dao.SetDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,5 +27,9 @@ class AppModule {
     fun provideProjectDao(appDatabase: AppDatabase): ProjectDao {
         return appDatabase.projectDao()
     }
-    
+
+    @Provides
+    fun provideSetDao(appDatabase: AppDatabase): SetDao {
+        return appDatabase.setDao()
+    }
 }
