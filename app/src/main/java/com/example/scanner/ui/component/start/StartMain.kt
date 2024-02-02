@@ -41,89 +41,19 @@ import java.util.concurrent.Executors
 
 @Composable
 fun StartMain(
+    onTakePictureFinished: () -> Unit
 ) {
 
     val isLandscape = LocalConfiguration.current.orientation
 
-    val boxAlignment = if (isLandscape == Configuration.ORIENTATION_LANDSCAPE) {
+    val cameraBoxAlignment = if (isLandscape == Configuration.ORIENTATION_LANDSCAPE) {
         Alignment.CenterEnd
     } else {
         Alignment.BottomCenter
     }
 
     CameraView(
-        boxAlignment = boxAlignment
+        boxAlignment = cameraBoxAlignment,
+        onTakePictureFinished = onTakePictureFinished
     )
-}
-
-@Composable
-fun CameraView(
-    boxAlignment: Alignment
-) {
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val imageCapture = remember{ ImageCapture.Builder().build() }
-    val cameraExecutor = Executors.newSingleThreadExecutor()
-
-    Box(contentAlignment = boxAlignment) {
-        AndroidView(
-            factory = {context ->
-
-            val previewView = PreviewView(context).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-                this.scaleType = scaleType
-            }
-
-            val previewUseCase = Preview.Builder().build()
-            previewUseCase.setSurfaceProvider(previewView.surfaceProvider)
-
-            val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-            cameraProviderFuture.addListener({
-                val cameraProvider = cameraProviderFuture.get()
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    lifecycleOwner,
-                    CameraSelector.DEFAULT_BACK_CAMERA,
-                    imageCapture,
-                    previewUseCase
-                )
-            }, ContextCompat.getMainExecutor(context))
-
-            previewView
-        })
-
-        IconButton(
-            onClick = {
-                val externalFilesDir = context.getExternalFilesDir(null)
-                val fileDir = File(externalFilesDir, "img_${System.currentTimeMillis()}.jpg")
-
-                val fileOption = ImageCapture.OutputFileOptions.Builder(fileDir).build()
-                imageCapture.takePicture(fileOption, cameraExecutor,
-                    object : ImageCapture.OnImageSavedCallback {
-                        override fun onError(error: ImageCaptureException) {
-                            println("error: ${error.message}")
-                        }
-                        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                            println("saved at: ${fileDir.absolutePath}")
-                        }
-                    })
-            },
-            content = {
-                Icon(
-                    Icons.Filled.Check,
-                    contentDescription = null,
-                )
-            },
-            modifier = Modifier
-                .padding(24.dp)
-                .background(
-                    color = Color.LightGray,
-                    shape = CircleShape
-                )
-        )
-    }
-
 }
