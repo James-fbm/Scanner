@@ -26,7 +26,7 @@ class HomeViewModel @Inject constructor(
                 _homeUiState.value = HomeUiState.Success(
                     allProjectItemCheckedState = ToggleableState.Off,
                     projectItemDeleteEnabled = false,
-                    topSearchBarUiModel = TopSearchBarUiModel(
+                    homeTopSearchBarUiModel = HomeTopSearchBarUiModel(
                         false,
                         ""
                     ),
@@ -100,7 +100,7 @@ class HomeViewModel @Inject constructor(
             _homeUiState.value = HomeUiState.Success(
                 newListToggleableState,
                 itemDeleteEnabled,
-                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).homeTopSearchBarUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
@@ -135,7 +135,7 @@ class HomeViewModel @Inject constructor(
             _homeUiState.value = HomeUiState.Success(
                 newListToggleableState,
                 itemDeleteEnabled,
-                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).homeTopSearchBarUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
@@ -163,7 +163,7 @@ class HomeViewModel @Inject constructor(
             _homeUiState.value = HomeUiState.Success(
                 (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
                 (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
-                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).homeTopSearchBarUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
@@ -175,9 +175,9 @@ class HomeViewModel @Inject constructor(
     fun switchTopSearchBarActiveState() {
         viewModelScope.launch {
 
-            val newSearchBarUiModel = TopSearchBarUiModel (
-                !(_homeUiState.value as HomeUiState.Success).topSearchBarUiModel.activeState,
-                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel.inputQuery
+            val newSearchBarUiModel = HomeTopSearchBarUiModel (
+                !(_homeUiState.value as HomeUiState.Success).homeTopSearchBarUiModel.activeState,
+                (_homeUiState.value as HomeUiState.Success).homeTopSearchBarUiModel.inputQuery
             )
 
             _homeUiState.value = HomeUiState.Success(
@@ -199,8 +199,8 @@ class HomeViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            val newSearchBarUiModel = TopSearchBarUiModel (
-                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel.activeState,
+            val newSearchBarUiModel = HomeTopSearchBarUiModel (
+                (_homeUiState.value as HomeUiState.Success).homeTopSearchBarUiModel.activeState,
                 inputQuery
             )
 
@@ -232,7 +232,7 @@ class HomeViewModel @Inject constructor(
                 _homeUiState.value = HomeUiState.Success(
                     (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
                     (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
-                    (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                    (_homeUiState.value as HomeUiState.Success).homeTopSearchBarUiModel,
                     (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                     newEditUiModel,
                     (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
@@ -255,7 +255,7 @@ class HomeViewModel @Inject constructor(
                 _homeUiState.value = HomeUiState.Success(
                     (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
                     (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
-                    (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                    (_homeUiState.value as HomeUiState.Success).homeTopSearchBarUiModel,
                     (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                     newEditUiModel,
                     (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
@@ -278,7 +278,7 @@ class HomeViewModel @Inject constructor(
             _homeUiState.value = HomeUiState.Success(
                 (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
                 (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
-                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).homeTopSearchBarUiModel,
                 newAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
@@ -297,7 +297,7 @@ class HomeViewModel @Inject constructor(
             _homeUiState.value = HomeUiState.Success(
                 (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
                 (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
-                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).homeTopSearchBarUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
                 newDeleteUiModel,
@@ -317,7 +317,7 @@ class HomeViewModel @Inject constructor(
             _homeUiState.value = HomeUiState.Success(
                 (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
                 (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
-                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).homeTopSearchBarUiModel,
                 newProjectAddUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectEditUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
@@ -346,7 +346,7 @@ class HomeViewModel @Inject constructor(
             _homeUiState.value = HomeUiState.Success(
                 (_homeUiState.value as HomeUiState.Success).allProjectItemCheckedState,
                 (_homeUiState.value as HomeUiState.Success).projectItemDeleteEnabled,
-                (_homeUiState.value as HomeUiState.Success).topSearchBarUiModel,
+                (_homeUiState.value as HomeUiState.Success).homeTopSearchBarUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectAddUiModel,
                 newEditUiModel,
                 (_homeUiState.value as HomeUiState.Success).projectDeleteUiModel,
@@ -380,7 +380,7 @@ data class ProjectItemUiModel (
     val menuVisible: Boolean
 )
 
-data class TopSearchBarUiModel (
+data class HomeTopSearchBarUiModel (
     val activeState: Boolean,
     val inputQuery: String
 )
@@ -404,7 +404,7 @@ sealed class HomeUiState {
     data class Success (
         val allProjectItemCheckedState: ToggleableState,
         val projectItemDeleteEnabled: Boolean,
-        val topSearchBarUiModel: TopSearchBarUiModel,
+        val homeTopSearchBarUiModel: HomeTopSearchBarUiModel,
         val projectAddUiModel: ProjectAddUiModel,
         val projectEditUiModel: ProjectEditUiModel,
         val projectDeleteUiModel: ProjectDeleteUiModel,

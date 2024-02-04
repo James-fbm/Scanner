@@ -2,10 +2,13 @@ package com.example.scanner.data.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.util.Date
 
-@Entity("tb_project")
+@Entity(
+    tableName = "tb_project",
+)
 data class ProjectEntity (
 
     @PrimaryKey(autoGenerate = true)

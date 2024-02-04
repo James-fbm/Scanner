@@ -1,4 +1,4 @@
-package com.example.scanner.ui.component.home
+package com.example.scanner.ui.component.project
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,12 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.scanner.ui.viewmodel.TopSearchBarUiModel
+import com.example.scanner.ui.viewmodel.ProjectTopSearchBarUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopNavigator (
-    topSearchBarUiModel: TopSearchBarUiModel,
+fun ProjectTopNavigator (
+    projectTopSearchBarUiModel: ProjectTopSearchBarUiModel,
     onSearchBarActiveChanged: () -> Unit,
     onSearchBarInputChanged: (String) -> Unit
 ) {
@@ -30,7 +30,7 @@ fun TopNavigator (
     ){
         SearchBar(
             modifier = Modifier.fillMaxWidth(),
-            active = topSearchBarUiModel.activeState,
+            active = projectTopSearchBarUiModel.activeState,
             onActiveChange = {
                 onSearchBarActiveChanged()
             },
@@ -42,7 +42,7 @@ fun TopNavigator (
             },
             placeholder = { Text("Search") },
             leadingIcon = {
-                if (!topSearchBarUiModel.activeState) {
+                if (!projectTopSearchBarUiModel.activeState) {
                     Icon(Icons.Outlined.Search, contentDescription = null)
                 } else {
                     IconButton(
@@ -53,7 +53,7 @@ fun TopNavigator (
                         Icon(Icons.Outlined.Clear, contentDescription = null)
                     }
                 }},
-            query = topSearchBarUiModel.inputQuery
+            query = projectTopSearchBarUiModel.inputQuery
         ) {
 
         }

@@ -1,4 +1,4 @@
-package com.example.scanner.ui.component.home
+package com.example.scanner.ui.component.project
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -20,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun BottomButtonGroup(
-    projectItemDeleteEnabled: Boolean,
+fun ProjectBottomButtonGroup(
+    collectionItemDeleteEnabled: Boolean,
     onAddDialogVisibleChanged: () -> Unit,
     onDeleteDialogVisibleChanged: () -> Unit
 ) {
@@ -33,7 +33,7 @@ fun BottomButtonGroup(
             horizontalArrangement = Arrangement.Center
         ) {
             IconButton(
-                enabled = projectItemDeleteEnabled,
+                enabled = collectionItemDeleteEnabled,
                 onClick = {
                     onDeleteDialogVisibleChanged()
                 }

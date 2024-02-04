@@ -32,9 +32,9 @@ fun HomeMain(
         is HomeUiState.Success -> {
             Scaffold(
                 topBar = {
-                    TopNavigator(
-                        topSearchBarUiModel =
-                        (homeUiState as HomeUiState.Success).topSearchBarUiModel,
+                    HomeTopNavigator(
+                        homeTopSearchBarUiModel =
+                        (homeUiState as HomeUiState.Success).homeTopSearchBarUiModel,
                         onSearchBarActiveChanged = {
                             homeViewModel.switchTopSearchBarActiveState()
                         },
@@ -44,7 +44,7 @@ fun HomeMain(
                     )
                 },
                 bottomBar = {
-                    BottomButtonGroup(
+                    HomeBottomButtonGroup(
                         projectItemDeleteEnabled =
                         (homeUiState as HomeUiState.Success).projectItemDeleteEnabled,
                         onAddDialogVisibleChanged = {

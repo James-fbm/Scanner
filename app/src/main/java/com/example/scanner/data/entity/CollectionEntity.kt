@@ -2,10 +2,19 @@ package com.example.scanner.data.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.util.Date
 
-@Entity("tb_collection")
+@Entity(
+    tableName = "tb_collection",
+    foreignKeys = [ForeignKey(
+        entity = ProjectEntity::class,
+        parentColumns = arrayOf("project_id"),
+        childColumns = arrayOf("project_id"),
+        onDelete = ForeignKey.CASCADE
+    )]
+)
 data class CollectionEntity (
 
     @PrimaryKey(autoGenerate = true)
