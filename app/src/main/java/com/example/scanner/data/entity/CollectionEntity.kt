@@ -5,15 +5,15 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.Date
 
-@Entity("tb_set")
-data class SetEntity (
+@Entity("tb_collection")
+data class CollectionEntity (
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo("set_id")
-    val setId: Int,
+    @ColumnInfo("collection_id")
+    val collectionId: Int,
 
-    @ColumnInfo("set_name")
-    val setName: String,
+    @ColumnInfo("collection_name")
+    val collectionName: String,
 
     @ColumnInfo("project_id")
     val projectId: Int,

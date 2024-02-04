@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.scanner.data.AppDatabase
 import com.example.scanner.data.dao.ProjectDao
-import com.example.scanner.data.dao.SetDao
+import com.example.scanner.data.dao.CollectionDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,7 +29,7 @@ class AppModule {
     }
 
     @Provides
-    fun provideSetDao(appDatabase: AppDatabase): SetDao {
-        return appDatabase.setDao()
+    fun provideSetDao(appDatabase: AppDatabase): CollectionDao {
+        return appDatabase.collectionDao()
     }
 }

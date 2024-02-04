@@ -8,6 +8,7 @@ import com.example.scanner.ui.component.home.HomeMain
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.scanner.ui.component.camera.ExternalDirPreview
 import com.example.scanner.ui.component.camera.CameraMain
+import com.example.scanner.ui.component.project.ProjectMain
 
 @Composable
 fun Navigation() {
@@ -16,12 +17,13 @@ fun Navigation() {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
             HomeMain(hiltViewModel()) {projectId ->
-                navController.navigate("start/${projectId}")
+                navController.navigate("project/${projectId}")
             }
         }
 
-        composable("start/{projectId}") {backStackEntry ->
+        composable("project/{projectId}") {backStackEntry ->
             val projectId = backStackEntry.arguments?.getString("projectId")?.toInt()
+            ProjectMain(hiltViewModel())
         }
     }
 }
