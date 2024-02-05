@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -44,6 +45,8 @@ fun ProjectDisplayBody(
             onClick = {
                 onAllItemCheckedStateChanged(allProjectItemCheckedState)
             })
+        Spacer(modifier = Modifier.weight(1f))
+        Text("Project List")
         Spacer(modifier = Modifier.weight(1f))
         IconButton(
             onClick = {}

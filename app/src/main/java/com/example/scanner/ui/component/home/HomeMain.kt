@@ -79,43 +79,43 @@ fun HomeMain(
                             homeViewModel.switchProjectEditDialogVisibility(projectItemUiModel)
                         }
                     )
-
-                    ProjectEditDialog(
-                        projectEditUiModel = (homeUiState as HomeUiState.Success).projectEditUiModel,
-                        onDialogVisibleChanged = { projectItemUiModel ->
-                            homeViewModel.switchProjectEditDialogVisibility(projectItemUiModel)
-                        },
-                        onDialogProjectNameInputChanged = {inputName ->
-                            homeViewModel.updateEditDialogProjectNameInput(inputName)
-                        },
-                        onEditRequestSubmitted = {projectEditUiModel ->
-                            homeViewModel.submitUpdateProject(projectEditUiModel)
-                        }
-                    )
-
-                    ProjectAddDialog(
-                        projectAddUiModel = (homeUiState as HomeUiState.Success).projectAddUiModel,
-                        onDialogVisibleChanged = {
-                            homeViewModel.switchProjectAddDialogVisibility()
-                        },
-                        onDialogProjectNameInputChanged = {inputName ->
-                            homeViewModel.updateAddDialogProjectNameInput(inputName)
-                        },
-                        onAddRequestSubmitted = { projectAddUiModel ->
-                            homeViewModel.submitAddProject(projectAddUiModel)
-                        }
-                    )
-
-                    ProjectDeleteDialog(
-                        projectDeleteUiModel = (homeUiState as HomeUiState.Success).projectDeleteUiModel,
-                        onDialogVisibleChanged = {
-                            homeViewModel.switchProjectDeleteDialogVisibility()
-                        },
-                        onDeleteRequestSubmitted = {
-                            homeViewModel.submitDeleteProject()
-                        }
-                    )
                 }
+
+                ProjectEditDialog(
+                    projectEditUiModel = (homeUiState as HomeUiState.Success).projectEditUiModel,
+                    onDialogVisibleChanged = { projectItemUiModel ->
+                        homeViewModel.switchProjectEditDialogVisibility(projectItemUiModel)
+                    },
+                    onDialogProjectNameInputChanged = {inputName ->
+                        homeViewModel.updateEditDialogProjectNameInput(inputName)
+                    },
+                    onEditRequestSubmitted = {projectEditUiModel ->
+                        homeViewModel.submitUpdateProject(projectEditUiModel)
+                    }
+                )
+
+                ProjectAddDialog(
+                    projectAddUiModel = (homeUiState as HomeUiState.Success).projectAddUiModel,
+                    onDialogVisibleChanged = {
+                        homeViewModel.switchProjectAddDialogVisibility()
+                    },
+                    onDialogProjectNameInputChanged = {inputName ->
+                        homeViewModel.updateAddDialogProjectNameInput(inputName)
+                    },
+                    onAddRequestSubmitted = { projectAddUiModel ->
+                        homeViewModel.submitAddProject(projectAddUiModel)
+                    }
+                )
+
+                ProjectDeleteDialog(
+                    projectDeleteUiModel = (homeUiState as HomeUiState.Success).projectDeleteUiModel,
+                    onDialogVisibleChanged = {
+                        homeViewModel.switchProjectDeleteDialogVisibility()
+                    },
+                    onDeleteRequestSubmitted = {
+                        homeViewModel.submitDeleteProject()
+                    }
+                )
             }
         }
     }

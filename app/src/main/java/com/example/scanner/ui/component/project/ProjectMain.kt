@@ -78,43 +78,43 @@ fun ProjectMain(
                             projectViewModel.switchCollectionEditDialogVisibility(collectionItemUiModel)
                         }
                     )
-
-                    CollectionEditDialog(
-                        collectionEditUiModel = (projectUiState as ProjectUiState.Success).collectionEditUiModel,
-                        onDialogVisibleChanged = { collectionItemUiModel ->
-                            projectViewModel.switchCollectionEditDialogVisibility(collectionItemUiModel)
-                        },
-                        onDialogCollectionNameInputChanged = {inputName ->
-                            projectViewModel.updateEditDialogCollectionNameInput(inputName)
-                        },
-                        onEditRequestSubmitted = {collectionEditUiModel ->
-                            projectViewModel.submitUpdateCollection(collectionEditUiModel)
-                        }
-                    )
-
-                    CollectionAddDialog(
-                        collectionAddUiModel = (projectUiState as ProjectUiState.Success).collectionAddUiModel,
-                        onDialogVisibleChanged = {
-                            projectViewModel.switchCollectionAddDialogVisibility()
-                        },
-                        onDialogCollectionNameInputChanged = {inputName ->
-                            projectViewModel.updateAddDialogCollectionNameInput(inputName)
-                        },
-                        onAddRequestSubmitted = { collectionAddUiModel ->
-                            projectViewModel.submitAddCollection(collectionAddUiModel)
-                        }
-                    )
-
-                    CollectionDeleteDialog(
-                        collectionDeleteUiModel = (projectUiState as ProjectUiState.Success).collectionDeleteUiModel,
-                        onDialogVisibleChanged = {
-                            projectViewModel.switchCollectionDeleteDialogVisibility()
-                        },
-                        onDeleteRequestSubmitted = {
-                            projectViewModel.submitDeleteCollection()
-                        }
-                    )
                 }
+
+                CollectionEditDialog(
+                    collectionEditUiModel = (projectUiState as ProjectUiState.Success).collectionEditUiModel,
+                    onDialogVisibleChanged = { collectionItemUiModel ->
+                        projectViewModel.switchCollectionEditDialogVisibility(collectionItemUiModel)
+                    },
+                    onDialogCollectionNameInputChanged = {inputName ->
+                        projectViewModel.updateEditDialogCollectionNameInput(inputName)
+                    },
+                    onEditRequestSubmitted = {collectionEditUiModel ->
+                        projectViewModel.submitUpdateCollection(collectionEditUiModel)
+                    }
+                )
+
+                CollectionAddDialog(
+                    collectionAddUiModel = (projectUiState as ProjectUiState.Success).collectionAddUiModel,
+                    onDialogVisibleChanged = {
+                        projectViewModel.switchCollectionAddDialogVisibility()
+                    },
+                    onDialogCollectionNameInputChanged = {inputName ->
+                        projectViewModel.updateAddDialogCollectionNameInput(inputName)
+                    },
+                    onAddRequestSubmitted = { collectionAddUiModel ->
+                        projectViewModel.submitAddCollection(collectionAddUiModel)
+                    }
+                )
+
+                CollectionDeleteDialog(
+                    collectionDeleteUiModel = (projectUiState as ProjectUiState.Success).collectionDeleteUiModel,
+                    onDialogVisibleChanged = {
+                        projectViewModel.switchCollectionDeleteDialogVisibility()
+                    },
+                    onDeleteRequestSubmitted = {
+                        projectViewModel.submitDeleteCollection()
+                    }
+                )
             }
         }
     }
