@@ -3,11 +3,13 @@ package com.example.scanner.data.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.Date
 
 @Entity(
     tableName = "tb_collection",
+    indices = [Index(value = ["project_id"])],
     foreignKeys = [ForeignKey(
         entity = ProjectEntity::class,
         parentColumns = arrayOf("project_id"),

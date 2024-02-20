@@ -49,8 +49,8 @@ camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.r
 camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraxVersion" }
 camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraxVersion" }
 
-apache-poi = { group = "org.apache.poi", name = "poi", version.ref = "poiVersion" }
-apache-poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "poiVersion" }
+#apache-poi = { group = "org.apache.poi", name = "poi", version.ref = "poiVersion" }
+#apache-poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "poiVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

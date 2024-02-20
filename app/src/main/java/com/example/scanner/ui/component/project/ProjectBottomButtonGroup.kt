@@ -46,14 +46,6 @@ fun ProjectBottomButtonGroup(
                 Icon(Icons.Filled.Delete, contentDescription = null)
             }
             Spacer(modifier = Modifier.weight(1f))
-            FloatingActionButton(
-                onClick = { onAddDialogVisibleChanged() },
-                containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = null)
-            }
-            Spacer(modifier = Modifier.weight(1f))
             IconButton(
                 onClick = {}
             ) {
@@ -62,6 +54,14 @@ fun ProjectBottomButtonGroup(
                     contentDescription = null,
                     modifier = Modifier.size(24.dp)
                 )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            FloatingActionButton(
+                onClick = { onAddDialogVisibleChanged() },
+                containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = null)
             }
         }
     }

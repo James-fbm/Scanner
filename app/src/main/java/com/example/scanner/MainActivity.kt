@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
-
+        
         setContent {
             ScannerTheme {
                 // A surface container using the 'background' color from the theme
@@ -35,6 +35,14 @@ class MainActivity : ComponentActivity() {
                     Navigation()
                 }
             }
+        }
+    }
+
+    external fun stringFromJNI(): String
+
+    companion object {
+        init {
+            System.loadLibrary("scanner")
         }
     }
 }
