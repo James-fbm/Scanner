@@ -1,6 +1,13 @@
 package com.example.scanner.ui.viewmodel
 
+import android.app.Activity
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.state.ToggleableState
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scanner.data.repo.CollectionRepository
@@ -20,9 +27,18 @@ class ProjectViewModel @Inject constructor(
     val projectUiState: StateFlow<ProjectUiState>
         get() = _projectUiState
 
-    var projectId: Int = 0
+    private val _projectId = MutableLiveData<Int>(0)
+    val projectId: LiveData<Int> = _projectId
+
+    fun setProjectId(projectId: Int) {
+        _projectId.value = projectId
+    }
 
     fun getCollectionList() {
+        val projectId = _projectId.value ?: run {
+            _projectUiState.value = ProjectUiState.Error
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             collectionRepository.getCollectionByProjectIdAsUiModel(projectId).collect() { collectionList ->
                 _projectUiState.value = ProjectUiState.Success(
@@ -54,6 +70,11 @@ class ProjectViewModel @Inject constructor(
     // ----------------------------------------------------------------------------------
     // The following functions are called after _projectUiState.value is ProjectUiState.Success
     // ----------------------------------------------------------------------------------
+
+    fun readExcelFile(uri: Uri?) {
+        // TODO: use cpp function to read excel file
+        // write data into database
+    }
 
     fun switchCollectionItemCheckedState
                 (collectionItemUiModel: CollectionItemUiModel) {
@@ -329,6 +350,9 @@ class ProjectViewModel @Inject constructor(
     }
 
     fun submitAddCollection(collectionAddUiModel: CollectionAddUiModel) {
+        val projectId = _projectId.value ?: run {
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             collectionRepository.insertOneCollectionFromUiModel(projectId, collectionAddUiModel)
         }

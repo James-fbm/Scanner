@@ -1,5 +1,6 @@
 package com.example.scanner.ui.component.project
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -51,6 +52,9 @@ fun ProjectMain(
                         },
                         onDeleteDialogVisibleChanged = {
                             projectViewModel.switchCollectionDeleteDialogVisibility()
+                        },
+                        onExcelFileSelected = {uri ->
+                            projectViewModel.readExcelFile(uri)
                         }
                     )
                 }

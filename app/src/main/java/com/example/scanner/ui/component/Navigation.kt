@@ -21,15 +21,18 @@ fun Navigation() {
         }
 
         composable("project/{projectId}") {backStackEntry ->
-            val projectId = backStackEntry.arguments?.getString("projectId")?.toInt()
+            val projectId = backStackEntry.arguments?.getString("projectId")?.toIntOrNull() ?: 0
             val projectViewModel: ProjectViewModel = hiltViewModel()
 
             // passing projectId to the injection constructor of the viewModel is tedious
             // currently we explicitly pass projectId as a mutable variable to the viewModel
             // maybe reimplemented if there is a better method
-            projectViewModel.projectId = projectId ?: 0
+            projectViewModel.setProjectId(projectId)
 
-            ProjectMain(projectViewModel) {_ -> }
+            ProjectMain(
+                projectViewModel = projectViewModel,
+                onCollectionItemClicked = {_ -> }
+            )
         }
     }
 }
