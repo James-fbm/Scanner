@@ -1,21 +1,26 @@
 package com.example.scanner.ui.viewmodel
 
 import android.app.Activity
+import android.app.Application
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.state.ToggleableState
+import androidx.core.net.toFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scanner.data.repo.CollectionRepository
+import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.FileOutputStream
+import java.io.InputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -71,9 +76,17 @@ class ProjectViewModel @Inject constructor(
     // The following functions are called after _projectUiState.value is ProjectUiState.Success
     // ----------------------------------------------------------------------------------
 
-    fun readExcelFile(uri: Uri?) {
-        // TODO: use cpp function to read excel file
-        // write data into database
+    suspend fun parseExcelFile(fileMeta: Pair<String?, String?>) {
+        // we have to make sure that the selected file has been copied
+        // to the cache before parsing it.
+
+        val filePath = fileMeta.first ?: return
+        val fileType = fileMeta.second ?: return
+
+        println("${fileMeta.first}, ${fileMeta.second}")
+        val retArray = readExcelHeader(filePath, fileType)
+        for (s in retArray)
+            println("$s")
     }
 
     fun switchCollectionItemCheckedState
@@ -439,3 +452,5 @@ sealed class ProjectUiState {
     data object Loading: ProjectUiState()
     data object Error: ProjectUiState()
 }
+
+external fun readExcelHeader(filePath: String, fileType: String): Array<String>
