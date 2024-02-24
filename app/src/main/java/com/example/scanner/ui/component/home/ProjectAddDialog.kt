@@ -34,7 +34,6 @@ fun ProjectAddDialog(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(240.dp)
                     .padding(16.dp),
                 shape = RoundedCornerShape(16.dp),
             ) {
@@ -59,7 +58,7 @@ fun ProjectAddDialog(
                         .padding(16.dp)
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(

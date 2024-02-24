@@ -1,26 +1,16 @@
 package com.example.scanner.ui.viewmodel
 
-import android.app.Activity
-import android.app.Application
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.state.ToggleableState
-import androidx.core.net.toFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scanner.data.repo.CollectionRepository
-import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.io.FileOutputStream
-import java.io.InputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -65,7 +55,11 @@ class ProjectViewModel @Inject constructor(
                     collectionDeleteUiModel = CollectionDeleteUiModel(
                         false
                     ),
-                    collectionItemUiModelList = collectionList
+                    collectionItemUiModelList = collectionList,
+                    excelImportUiModel = ExcelImportUiModel(
+                        emptyList(),
+                        false
+                    )
                 )
             }
 
@@ -83,10 +77,26 @@ class ProjectViewModel @Inject constructor(
         val filePath = fileMeta.first ?: return
         val fileType = fileMeta.second ?: return
 
-        println("${fileMeta.first}, ${fileMeta.second}")
-        val retArray = readExcelHeader(filePath, fileType)
-        for (s in retArray)
-            println("$s")
+        val headerArray = readExcelHeader(filePath, fileType)
+        val headerArrayChecked: List<Pair<String, Boolean>> = headerArray.map {element ->
+            Pair(element, false)
+        }
+
+        val newImportUiModel = ExcelImportUiModel(
+            headerArrayChecked,
+            true
+        )
+
+        _projectUiState.value = ProjectUiState.Success(
+            (_projectUiState.value as ProjectUiState.Success).allCollectionItemCheckedState,
+            (_projectUiState.value as ProjectUiState.Success).collectionItemDeleteEnabled,
+            (_projectUiState.value as ProjectUiState.Success).projectTopSearchBarUiModel,
+            (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
+            (_projectUiState.value as ProjectUiState.Success).collectionEditUiModel,
+            (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
+            (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
+            newImportUiModel
+        )
     }
 
     fun switchCollectionItemCheckedState
@@ -140,7 +150,8 @@ class ProjectViewModel @Inject constructor(
                 (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionEditUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
-                newItemList
+                newItemList,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel
             )
         }
     }
@@ -175,7 +186,8 @@ class ProjectViewModel @Inject constructor(
                 (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionEditUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
-                newItemList
+                newItemList,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel
             )
         }
     }
@@ -203,7 +215,37 @@ class ProjectViewModel @Inject constructor(
                 (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionEditUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
-                newItemList
+                newItemList,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel
+            )
+        }
+    }
+
+    fun switchExcelHeaderCheckedState (index: Int) {
+        viewModelScope.launch {
+            val headerCheckedList = (_projectUiState.value as ProjectUiState.Success).excelImportUiModel.headerCheckedList
+            val newHeaderCheckedList = headerCheckedList.mapIndexed { mapIndex, pair ->
+                if (mapIndex != index) {
+                    pair
+                } else {
+                    pair.copy(second = !pair.second)
+                }
+            }
+
+            val newImportUiModel = ExcelImportUiModel(
+                newHeaderCheckedList,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel.dialogVisible
+            )
+
+            _projectUiState.value = ProjectUiState.Success(
+                (_projectUiState.value as ProjectUiState.Success).allCollectionItemCheckedState,
+                (_projectUiState.value as ProjectUiState.Success).collectionItemDeleteEnabled,
+                (_projectUiState.value as ProjectUiState.Success).projectTopSearchBarUiModel,
+                (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
+                (_projectUiState.value as ProjectUiState.Success).collectionEditUiModel,
+                (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
+                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
+                newImportUiModel
             )
         }
     }
@@ -223,7 +265,8 @@ class ProjectViewModel @Inject constructor(
                 (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionEditUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
-                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList
+                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel
             )
         }
     }
@@ -247,7 +290,8 @@ class ProjectViewModel @Inject constructor(
                 (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionEditUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
-                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList
+                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel
             )
         }
     }
@@ -272,7 +316,8 @@ class ProjectViewModel @Inject constructor(
                     (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
                     newEditUiModel,
                     (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
-                    (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList
+                    (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
+                    (_projectUiState.value as ProjectUiState.Success).excelImportUiModel
                 )
             } else {
 
@@ -295,7 +340,8 @@ class ProjectViewModel @Inject constructor(
                     (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
                     newEditUiModel,
                     (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
-                    (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList
+                    (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
+                    (_projectUiState.value as ProjectUiState.Success).excelImportUiModel
                 )
             }
         }
@@ -318,7 +364,8 @@ class ProjectViewModel @Inject constructor(
                 newAddUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionEditUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
-                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList
+                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel
             )
         }
     }
@@ -337,7 +384,31 @@ class ProjectViewModel @Inject constructor(
                 (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionEditUiModel,
                 newDeleteUiModel,
-                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList
+                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel
+            )
+        }
+    }
+
+    fun closeExcelImportDialog() {
+        // the dialog is opened in parseExcelHeader() function
+
+        viewModelScope.launch {
+
+            val newImportUiModel = ExcelImportUiModel (
+                emptyList(),
+                false
+            )
+
+            _projectUiState.value = ProjectUiState.Success(
+                (_projectUiState.value as ProjectUiState.Success).allCollectionItemCheckedState,
+                (_projectUiState.value as ProjectUiState.Success).collectionItemDeleteEnabled,
+                (_projectUiState.value as ProjectUiState.Success).projectTopSearchBarUiModel,
+                (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
+                (_projectUiState.value as ProjectUiState.Success).collectionEditUiModel,
+                (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
+                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
+                newImportUiModel
             )
         }
     }
@@ -357,7 +428,8 @@ class ProjectViewModel @Inject constructor(
                 newCollectionAddUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionEditUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
-                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList
+                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel
             )
         }
     }
@@ -389,7 +461,8 @@ class ProjectViewModel @Inject constructor(
                 (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
                 newEditUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
-                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList
+                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel
             )
         }
     }
@@ -408,6 +481,10 @@ class ProjectViewModel @Inject constructor(
 
             collectionRepository.updateCollectionFromUiModel(collectionEditUiModel)
         }
+    }
+
+    fun submitImportExcel(excelImportUiModel: ExcelImportUiModel) {
+        closeExcelImportDialog()
     }
 }
 
@@ -439,6 +516,14 @@ data class CollectionDeleteUiModel (
     val dialogVisible: Boolean
 )
 
+data class ExcelImportUiModel (
+    // we have to maintain the order of header elements
+    // that means, the index of the elements should be preserved implicitly
+    // if we use Map, the order may be shuffled
+    val headerCheckedList: List<Pair<String, Boolean>>,
+    val dialogVisible: Boolean
+)
+
 sealed class ProjectUiState {
     data class Success (
         val allCollectionItemCheckedState: ToggleableState,
@@ -447,7 +532,8 @@ sealed class ProjectUiState {
         val collectionAddUiModel: CollectionAddUiModel,
         val collectionEditUiModel: CollectionEditUiModel,
         val collectionDeleteUiModel: CollectionDeleteUiModel,
-        val collectionItemUiModelList: List<CollectionItemUiModel>
+        val collectionItemUiModelList: List<CollectionItemUiModel>,
+        val excelImportUiModel: ExcelImportUiModel
     ): ProjectUiState()
     data object Loading: ProjectUiState()
     data object Error: ProjectUiState()

@@ -15,6 +15,7 @@ lifecycleViewmodelCompose = "2.6.2"
 navigationVersion = "2.7.6"
 hiltNavigationVersion = "1.1.0"
 cameraxVersion = "1.4.0-alpha03"
+constraintLayoutVersion = "1.1.0-alpha13"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,7 @@ camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "
 camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "cameraxVersion" }
 camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraxVersion" }
 camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraxVersion" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

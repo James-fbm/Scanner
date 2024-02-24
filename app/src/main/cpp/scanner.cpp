@@ -14,16 +14,27 @@ JNIEXPORT jobjectArray JNICALL
 Java_com_example_scanner_ui_viewmodel_ProjectViewModelKt_readExcelHeader(
         JNIEnv* env, jclass, jstring jFilePath, jstring jFileType) {
 
-    const char *filePath = env->GetStringUTFChars(jFilePath, nullptr);
-    std::string file_path(filePath);
-    env->ReleaseStringUTFChars(jFilePath, filePath);
+    const char *file_path = env->GetStringUTFChars(jFilePath, nullptr);
+    const char *file_type = env->GetStringUTFChars(jFileType, nullptr);
 
-    std::vector<std::string> vec_header = read_csvheader(file_path.c_str());
+    std::vector<std::string> vec_header;
+    if (strcmp(file_type, "xls") == 0) {
+        // TODO
+    } else if (strcmp(file_type, "xlsx") == 0) {
+        // TODO
+    } else {
+        vec_header = read_csvheader(file_path);
+    }
 
-    jobjectArray retArray = env->NewObjectArray(vec_header.size(), env->FindClass("java/lang/String"), nullptr);
+    jobjectArray headerArray = env->NewObjectArray(vec_header.size(),
+                                                   env->FindClass("java/lang/String"), nullptr);
 
     for (size_t i = 0; i < vec_header.size(); ++i) {
-        env->SetObjectArrayElement(retArray, i, env->NewStringUTF(vec_header[i].c_str()));
+        env->SetObjectArrayElement(headerArray, i, env->NewStringUTF(vec_header[i].c_str()));
     }
-    return retArray;
+
+    env->ReleaseStringUTFChars(jFilePath, file_path);
+    env->ReleaseStringUTFChars(jFileType, file_type);
+
+    return headerArray;
 }

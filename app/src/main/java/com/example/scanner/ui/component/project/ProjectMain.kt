@@ -118,6 +118,19 @@ fun ProjectMain(
                         projectViewModel.submitDeleteCollection()
                     }
                 )
+
+                ExcelImportDialog(
+                    excelImportUiModel = (projectUiState as ProjectUiState.Success).excelImportUiModel,
+                    onHeaderCheckedStateChanged = {index ->
+                        projectViewModel.switchExcelHeaderCheckedState(index)
+                    },
+                    onDialogVisibleChanged = {
+                        projectViewModel.closeExcelImportDialog()
+                    },
+                    onImportRequestSubmitted = {excelImportUiModel ->
+                        projectViewModel.submitImportExcel(excelImportUiModel)
+                    }
+                )
             }
         }
     }
