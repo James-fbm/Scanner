@@ -53,6 +53,7 @@ void thread_copy_record(JavaVM* jvm, jobject recordMap, jmethodID mapPutMethod,
     JNIEnv* env = nullptr;
     jvm->AttachCurrentThread(&env, nullptr);
 
+
     for (auto entry = start ; entry != end ; ++entry) {
         jobjectArray keyArray = env->NewObjectArray(entry->first.size(), env->FindClass("java/lang/String"), nullptr);
         for (size_t i = 0; i < entry->first.size(); ++i) {
@@ -118,15 +119,16 @@ Java_com_example_scanner_data_repo_CollectionRepositoryKt_readExcelRecord(
         env->ReleaseStringUTFChars(jFileType, file_type);
         return nullptr;
     }
-
     jmethodID mapConstructor = env->GetMethodID(mapClass, "<init>", "()V");
     jobject recordMap = env->NewObject(mapClass, mapConstructor);
+    // global reference shared between threads
     jobject globalRecordMap = env->NewGlobalRef(recordMap);
     jmethodID mapPutMethod = env->GetMethodID(mapClass, "put",
                                               "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 
     int record_size = index_record.size();
     int max_thread_count = std::thread::hardware_concurrency();
+    // regulate thread count according to data size
     int thread_count = std::min((int)(record_size / 100) + 1, max_thread_count);
     int batch_size = index_record.size() / thread_count;
     std::vector<std::thread> threads;
@@ -140,8 +142,7 @@ Java_com_example_scanner_data_repo_CollectionRepositoryKt_readExcelRecord(
         std::advance(it, batch_size);
         auto it_end = (i == thread_count - 1) ? index_record.cend() : it;
 
-        std::thread t(thread_copy_record, jvm, globalRecordMap, mapPutMethod, it_start, it_end);
-        threads.push_back(std::move(t));
+        threads.emplace_back(thread_copy_record, jvm, globalRecordMap, mapPutMethod, it_start, it_end);
     }
 
     for (auto& t: threads) {
