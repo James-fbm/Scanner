@@ -166,7 +166,14 @@ IndexRecord read_csvrecord(const char *file_path, const std::vector<int> &index_
         if (index_record.find(index_element) == index_record.end()) {
             index_record[index_element] = std::vector<std::vector<std::string>>();
         }
+        if (index_record[index_element].size() == 6) {
+            // only remain first three and last three elements
+            index_record[index_element][3] = index_record[index_element][4];
+            index_record[index_element][4] = index_record[index_element][5];
+            index_record[index_element].pop_back();
+        }
         index_record[index_element].push_back(line_element);
+
     }
 
     return index_record;

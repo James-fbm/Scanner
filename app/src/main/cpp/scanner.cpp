@@ -1,7 +1,7 @@
 #include <jni.h>
-#include <string>
+#include <thread>
+#include <syslog.h>
 #include "libexcelreader/excelreader.h"
-
 
 extern "C"
 JNIEXPORT jobjectArray JNICALL
@@ -46,6 +46,42 @@ Java_com_example_scanner_ui_viewmodel_ProjectViewModelKt_readExcelHeader(
     return headerArray;
 }
 
+
+void thread_copy_record(JavaVM* jvm, jobject recordMap, jmethodID mapPutMethod,
+                        IndexRecord::const_iterator start, IndexRecord::const_iterator end) {
+
+    JNIEnv* env = nullptr;
+    jvm->AttachCurrentThread(&env, nullptr);
+
+    for (auto entry = start ; entry != end ; ++entry) {
+        jobjectArray keyArray = env->NewObjectArray(entry->first.size(), env->FindClass("java/lang/String"), nullptr);
+        for (size_t i = 0; i < entry->first.size(); ++i) {
+            jstring stringKey = env->NewStringUTF(entry->first[i].c_str());
+            env->SetObjectArrayElement(keyArray, i, stringKey);
+            env->DeleteLocalRef(stringKey);
+        }
+
+        jobjectArray valueArray = env->NewObjectArray(entry->second.size(), env->FindClass("[Ljava/lang/String;"), nullptr);
+        for (size_t i = 0; i < entry->second.size(); ++i) {
+            jobjectArray innerArray = env->NewObjectArray(entry->second[i].size(), env->FindClass("java/lang/String"), nullptr);
+            for (size_t j = 0; j < entry->second[i].size(); ++j) {
+                jstring stringValue = env->NewStringUTF(entry->second[i][j].c_str());
+                env->SetObjectArrayElement(innerArray, j, stringValue);
+                env->DeleteLocalRef(stringValue);
+            }
+            env->SetObjectArrayElement(valueArray, i, innerArray);
+            env->DeleteLocalRef(innerArray);
+        }
+
+        env->CallObjectMethod(recordMap, mapPutMethod, keyArray, valueArray);
+        env->DeleteLocalRef(keyArray);
+        env->DeleteLocalRef(valueArray);
+    }
+
+    jvm->DetachCurrentThread();
+}
+
+
 extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_example_scanner_data_repo_CollectionRepositoryKt_readExcelRecord(
@@ -76,7 +112,7 @@ Java_com_example_scanner_data_repo_CollectionRepositoryKt_readExcelRecord(
         return nullptr;
     }
 
-    jclass mapClass = env->FindClass("java/util/HashMap");
+    jclass mapClass = env->FindClass("java/util/concurrent/ConcurrentHashMap");
     if(mapClass == nullptr) {
         env->ReleaseStringUTFChars(jFilePath, file_path);
         env->ReleaseStringUTFChars(jFileType, file_type);
@@ -85,37 +121,36 @@ Java_com_example_scanner_data_repo_CollectionRepositoryKt_readExcelRecord(
 
     jmethodID mapConstructor = env->GetMethodID(mapClass, "<init>", "()V");
     jobject recordMap = env->NewObject(mapClass, mapConstructor);
-
+    jobject globalRecordMap = env->NewGlobalRef(recordMap);
     jmethodID mapPutMethod = env->GetMethodID(mapClass, "put",
                                               "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 
-    for (const auto& entry : index_record) {
-        jobjectArray keyArray = env->NewObjectArray(entry.first.size(), env->FindClass("java/lang/String"), NULL);
-        for (size_t i = 0; i < entry.first.size(); ++i) {
-            jstring stringKey = env->NewStringUTF(entry.first[i].c_str());
-            env->SetObjectArrayElement(keyArray, i, stringKey);
-            env->DeleteLocalRef(stringKey);
-        }
+    int record_size = index_record.size();
+    int max_thread_count = std::thread::hardware_concurrency();
+    int thread_count = std::min((int)(record_size / 100) + 1, max_thread_count);
+    int batch_size = index_record.size() / thread_count;
+    std::vector<std::thread> threads;
 
-        jobjectArray valueArray = env->NewObjectArray(entry.second.size(), env->FindClass("[Ljava/lang/String;"), NULL);
-        for (size_t i = 0; i < entry.second.size(); ++i) {
-            jobjectArray innerArray = env->NewObjectArray(entry.second[i].size(), env->FindClass("java/lang/String"), NULL);
-            for (size_t j = 0; j < entry.second[i].size(); ++j) {
-                jstring stringValue = env->NewStringUTF(entry.second[i][j].c_str());
-                env->SetObjectArrayElement(innerArray, j, stringValue);
-                env->DeleteLocalRef(stringValue);
-            }
-            env->SetObjectArrayElement(valueArray, i, innerArray);
-            env->DeleteLocalRef(innerArray);
-        }
+    JavaVM* jvm = nullptr;
+    env->GetJavaVM(&jvm);
 
-        jobject previousValue = env->CallObjectMethod(recordMap, mapPutMethod, keyArray, valueArray);
-        env->DeleteLocalRef(previousValue);
-        env->DeleteLocalRef(keyArray);
-        env->DeleteLocalRef(valueArray);
+    auto it = index_record.cbegin();
+    for (int i = 0 ; i < thread_count ; ++i) {
+        auto it_start = it;
+        std::advance(it, batch_size);
+        auto it_end = (i == thread_count - 1) ? index_record.cend() : it;
+
+        std::thread t(thread_copy_record, jvm, globalRecordMap, mapPutMethod, it_start, it_end);
+        threads.push_back(std::move(t));
+    }
+
+    for (auto& t: threads) {
+        t.join();
     }
 
     env->ReleaseStringUTFChars(jFilePath, file_path);
     env->ReleaseStringUTFChars(jFileType, file_type);
+
+    env->DeleteGlobalRef(globalRecordMap);
     return recordMap;
 }
