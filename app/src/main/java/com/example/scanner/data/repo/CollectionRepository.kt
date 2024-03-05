@@ -5,6 +5,7 @@ import com.example.scanner.data.entity.CollectionEntity
 import com.example.scanner.ui.viewmodel.CollectionAddUiModel
 import com.example.scanner.ui.viewmodel.CollectionEditUiModel
 import com.example.scanner.ui.viewmodel.CollectionItemUiModel
+import com.example.scanner.ui.viewmodel.ExcelImportUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.Date
@@ -56,4 +57,25 @@ class CollectionRepository @Inject constructor(
 
         collectionDao.updateOne(collectionId, collectionName, modifyTime)
     }
+
+    suspend fun importCollectionFromExcelFile(projectId: Int, excelImportUiModel: ExcelImportUiModel,
+                                              indexIdArray: IntArray): Int {
+        val record = readExcelRecord(excelImportUiModel.filePath, excelImportUiModel.fileType, indexIdArray) ?: return 0
+
+        val collectionEntity = CollectionEntity(
+            // id will be ignored here
+            collectionId = 0,
+            collectionName = excelImportUiModel.collectionAlias,
+            projectId = projectId,
+            createTime = Date(),
+            modifyTime = Date()
+        )
+
+        collectionDao.insertOne(collectionEntity)
+
+        return record.keys.size
+    }
 }
+
+typealias IndexRecord = Map<Array<String>, Array<Array<String>>>?
+external fun readExcelRecord(filePath: String, fileType: String, indexIdArray: IntArray): IndexRecord

@@ -4,10 +4,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.scanner.ui.component.Loading
@@ -21,8 +25,15 @@ fun ProjectMain(
 ) {
     val projectUiState by projectViewModel.projectUiState.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
         projectViewModel.getCollectionList()
+
+        projectViewModel.snackbarMessages.collect { message ->
+            snackbarHostState.showSnackbar(message)
+        }
     }
 
     when(projectUiState) {
@@ -41,6 +52,7 @@ fun ProjectMain(
                             projectViewModel.updateTopSearchBarInput(topSearchBarInput)
                         }
                     )
+                    SnackbarHost(hostState = snackbarHostState)
                 },
                 bottomBar = {
                     ProjectBottomButtonGroup(
@@ -52,8 +64,8 @@ fun ProjectMain(
                         onDeleteDialogVisibleChanged = {
                             projectViewModel.switchCollectionDeleteDialogVisibility()
                         },
-                        parseExcelFile =  { fileMeta ->
-                            projectViewModel.parseExcelFile(fileMeta)
+                        parseExcelHeader =  { fileMeta ->
+                            projectViewModel.parseExcelHeader(fileMeta)
                         }
                     )
                 }
@@ -126,6 +138,9 @@ fun ProjectMain(
                     },
                     onDialogVisibleChanged = {
                         projectViewModel.closeExcelImportDialog()
+                    },
+                    onExcelImportAliasChanged = { inputAlias ->
+                        projectViewModel.updateExcelImportAliasInput(inputAlias)
                     },
                     onImportRequestSubmitted = {excelImportUiModel ->
                         projectViewModel.submitImportExcel(excelImportUiModel)

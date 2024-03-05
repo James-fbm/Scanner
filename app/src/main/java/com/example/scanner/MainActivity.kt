@@ -38,8 +38,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    external fun stringFromJNI(): String
-
     companion object {
         init {
             System.loadLibrary("scanner")

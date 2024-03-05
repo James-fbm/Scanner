@@ -8,8 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.scanner.data.repo.CollectionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,6 +26,9 @@ class ProjectViewModel @Inject constructor(
 
     private val _projectId = MutableLiveData<Int>(0)
     val projectId: LiveData<Int> = _projectId
+
+    private val snackbarMessageChannel = Channel<String>()
+    val snackbarMessages = snackbarMessageChannel.receiveAsFlow()
 
     fun setProjectId(projectId: Int) {
         _projectId.value = projectId
@@ -57,6 +62,9 @@ class ProjectViewModel @Inject constructor(
                     ),
                     collectionItemUiModelList = collectionList,
                     excelImportUiModel = ExcelImportUiModel(
+                        "",
+                        "",
+                        "",
                         emptyList(),
                         false
                     )
@@ -70,7 +78,7 @@ class ProjectViewModel @Inject constructor(
     // The following functions are called after _projectUiState.value is ProjectUiState.Success
     // ----------------------------------------------------------------------------------
 
-    suspend fun parseExcelFile(fileMeta: Pair<String?, String?>) {
+    suspend fun parseExcelHeader(fileMeta: Pair<String?, String?>) {
         // we have to make sure that the selected file has been copied
         // to the cache before parsing it.
 
@@ -78,13 +86,20 @@ class ProjectViewModel @Inject constructor(
         val fileType = fileMeta.second ?: return
 
         val headerArray = readExcelHeader(filePath, fileType)
-        val headerArrayChecked: List<Pair<String, Boolean>> = headerArray.map {element ->
-            Pair(element, false)
+        if (headerArray.isNullOrEmpty()) {
+            // an error occurs during parsing, or the file itself is empty
+            return
+        }
+        val headerArrayChecked: List<Pair<String, Boolean>> = headerArray.mapIndexed { index, element ->
+            Pair("${index + 1}. $element", false)
         }
 
         val newImportUiModel = ExcelImportUiModel(
+            filePath,
+            fileType,
+            "",
             headerArrayChecked,
-            true
+            true,
         )
 
         _projectUiState.value = ProjectUiState.Success(
@@ -233,6 +248,9 @@ class ProjectViewModel @Inject constructor(
             }
 
             val newImportUiModel = ExcelImportUiModel(
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel.filePath,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel.fileType,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel.collectionAlias,
                 newHeaderCheckedList,
                 (_projectUiState.value as ProjectUiState.Success).excelImportUiModel.dialogVisible
             )
@@ -292,6 +310,30 @@ class ProjectViewModel @Inject constructor(
                 (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
                 (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
                 (_projectUiState.value as ProjectUiState.Success).excelImportUiModel
+            )
+        }
+    }
+
+    fun updateExcelImportAliasInput(inputAlias: String) {
+        viewModelScope.launch {
+
+            val newImportUiModel = ExcelImportUiModel (
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel.filePath,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel.fileType,
+                inputAlias,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel.headerCheckedList,
+                (_projectUiState.value as ProjectUiState.Success).excelImportUiModel.dialogVisible
+            )
+
+            _projectUiState.value = ProjectUiState.Success(
+                (_projectUiState.value as ProjectUiState.Success).allCollectionItemCheckedState,
+                (_projectUiState.value as ProjectUiState.Success).collectionItemDeleteEnabled,
+                (_projectUiState.value as ProjectUiState.Success).projectTopSearchBarUiModel,
+                (_projectUiState.value as ProjectUiState.Success).collectionAddUiModel,
+                (_projectUiState.value as ProjectUiState.Success).collectionEditUiModel,
+                (_projectUiState.value as ProjectUiState.Success).collectionDeleteUiModel,
+                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList,
+                newImportUiModel
             )
         }
     }
@@ -396,6 +438,9 @@ class ProjectViewModel @Inject constructor(
         viewModelScope.launch {
 
             val newImportUiModel = ExcelImportUiModel (
+                "",
+                "",
+                "",
                 emptyList(),
                 false
             )
@@ -434,15 +479,6 @@ class ProjectViewModel @Inject constructor(
         }
     }
 
-    fun submitAddCollection(collectionAddUiModel: CollectionAddUiModel) {
-        val projectId = _projectId.value ?: run {
-            return
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            collectionRepository.insertOneCollectionFromUiModel(projectId, collectionAddUiModel)
-        }
-    }
-
     fun updateEditDialogCollectionNameInput(inputName: String) {
         viewModelScope.launch {
 
@@ -467,6 +503,15 @@ class ProjectViewModel @Inject constructor(
         }
     }
 
+    fun submitAddCollection(collectionAddUiModel: CollectionAddUiModel) {
+        val projectId = _projectId.value ?: run {
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            collectionRepository.insertOneCollectionFromUiModel(projectId, collectionAddUiModel)
+        }
+    }
+
     fun submitDeleteCollection() {
         viewModelScope.launch(Dispatchers.IO) {
 
@@ -484,7 +529,28 @@ class ProjectViewModel @Inject constructor(
     }
 
     fun submitImportExcel(excelImportUiModel: ExcelImportUiModel) {
-        closeExcelImportDialog()
+        val projectId = _projectId.value ?: run {
+            return
+        }
+
+        _projectUiState.value = ProjectUiState.Loading
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val startTime = System.currentTimeMillis()
+
+            val indexIdArray = excelImportUiModel.headerCheckedList.mapIndexedNotNull { index, pair ->
+                if (pair.second) index else null
+            }.toIntArray()
+
+            val elementCount = collectionRepository.importCollectionFromExcelFile(projectId, excelImportUiModel, indexIdArray)
+
+            val endTime = System.currentTimeMillis()
+            val elapsedTime = endTime - startTime
+
+            getCollectionList()
+
+            snackbarMessageChannel.send("Import $elementCount elements in $elapsedTime ms")
+        }
     }
 }
 
@@ -520,6 +586,9 @@ data class ExcelImportUiModel (
     // we have to maintain the order of header elements
     // that means, the index of the elements should be preserved implicitly
     // if we use Map, the order may be shuffled
+    val filePath: String,
+    val fileType: String,
+    val collectionAlias: String,
     val headerCheckedList: List<Pair<String, Boolean>>,
     val dialogVisible: Boolean
 )
@@ -539,4 +608,4 @@ sealed class ProjectUiState {
     data object Error: ProjectUiState()
 }
 
-external fun readExcelHeader(filePath: String, fileType: String): Array<String>
+external fun readExcelHeader(filePath: String, fileType: String): Array<String>?

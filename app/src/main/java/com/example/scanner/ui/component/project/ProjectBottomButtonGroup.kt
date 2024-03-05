@@ -42,7 +42,7 @@ fun ProjectBottomButtonGroup(
     collectionItemDeleteEnabled: Boolean,
     onAddDialogVisibleChanged: () -> Unit,
     onDeleteDialogVisibleChanged: () -> Unit,
-    parseExcelFile: suspend (Pair<String?, String?>) -> Unit
+    parseExcelHeader: suspend (Pair<String?, String?>) -> Unit
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -52,7 +52,7 @@ fun ProjectBottomButtonGroup(
 
             coroutineScope.launch(Dispatchers.IO) {
                 val fileMeta = copyExcelFileToCache(uri, context)
-                parseExcelFile(fileMeta)
+                parseExcelHeader(fileMeta)
             }
         }
     }

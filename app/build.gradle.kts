@@ -48,7 +48,8 @@ android {
             isMinifyEnabled = false
             externalNativeBuild {
                 cmake {
-                    arguments += "-DCMAKE_BUILD_TYPE=Debug"
+                    // arguments += "-DCMAKE_BUILD_TYPE=Debug"
+                    arguments += "-DCMAKE_BUILD_TYPE=Release"
                 }
             }
         }
