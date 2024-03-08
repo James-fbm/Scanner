@@ -1,5 +1,7 @@
 package com.example.scanner.data.repo
 
+import com.example.scanner.R
+import com.example.scanner.data.SQLITE_BATCHSIZE
 import com.example.scanner.data.dao.VolumeDao
 import com.example.scanner.data.entity.VolumeEntity
 import com.example.scanner.ui.viewmodel.VolumeAddUiModel
@@ -47,7 +49,13 @@ class VolumeRepository @Inject constructor(
             .filter { volumeItemUiModel -> volumeItemUiModel.itemChecked }
             .map { volumeItemUiModel -> volumeItemUiModel.volumeId }
 
-        volumeDao.deleteByIdList(toDeleteIdList)
+        val batchSize = SQLITE_BATCHSIZE
+
+        for (i in toDeleteIdList.indices step batchSize) {
+            val end = minOf(i + batchSize, toDeleteIdList.size)
+            val batch = toDeleteIdList.subList(i, end)
+            volumeDao.deleteByIdList(batch)
+        }
     }
 
     suspend fun updateVolumeFromUiModel(volumeEditUiModel: VolumeEditUiModel) {

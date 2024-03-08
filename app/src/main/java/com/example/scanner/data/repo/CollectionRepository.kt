@@ -1,7 +1,11 @@
 package com.example.scanner.data.repo
 
+import com.example.scanner.R
+import com.example.scanner.data.SQLITE_BATCHSIZE
 import com.example.scanner.data.dao.CollectionDao
+import com.example.scanner.data.dao.VolumeDao
 import com.example.scanner.data.entity.CollectionEntity
+import com.example.scanner.data.entity.VolumeEntity
 import com.example.scanner.ui.viewmodel.CollectionAddUiModel
 import com.example.scanner.ui.viewmodel.CollectionEditUiModel
 import com.example.scanner.ui.viewmodel.CollectionItemUiModel
@@ -12,7 +16,8 @@ import java.util.Date
 import javax.inject.Inject
 
 class CollectionRepository @Inject constructor(
-    private val collectionDao: CollectionDao
+    private val collectionDao: CollectionDao,
+    private val volumeDao: VolumeDao
 ) {
     suspend fun getCollectionByProjectIdAsUiModel(projectId: Int):
             Flow<List<CollectionItemUiModel>> {
@@ -47,7 +52,13 @@ class CollectionRepository @Inject constructor(
             .filter { collectionItemUiModel -> collectionItemUiModel.itemChecked }
             .map { collectionItemUiModel -> collectionItemUiModel.collectionId }
 
-        collectionDao.deleteByIdList(toDeleteIdList)
+        val batchSize = SQLITE_BATCHSIZE
+
+        for (i in toDeleteIdList.indices step batchSize) {
+            val end = minOf(i + batchSize, toDeleteIdList.size)
+            val batch = toDeleteIdList.subList(i, end)
+            collectionDao.deleteByIdList(batch)
+        }
     }
 
     suspend fun updateCollectionFromUiModel(collectionEditUiModel: CollectionEditUiModel) {
@@ -71,8 +82,28 @@ class CollectionRepository @Inject constructor(
             modifyTime = Date()
         )
 
-        collectionDao.insertOne(collectionEntity)
+        val newCollectionId = collectionDao.insertOne(collectionEntity)
+        val toInsertVolumeList: List<VolumeEntity> = record.map {r ->
+            var volumeIndex: String = ""
+            for ((index, e) in r.key.withIndex()) {
+                volumeIndex += e
+                if (index != r.key.size - 1) {
+                    volumeIndex += '_'
+                }
+            }
 
+            VolumeEntity(
+                // id will be ignored here
+                volumeId = 0,
+                volumeName = volumeIndex,
+                volumeSource = "",
+                collectionId = newCollectionId.toInt(),
+                createTime = Date(),
+                modifyTime = Date()
+            )
+        }
+
+        volumeDao.insertFromList(toInsertVolumeList)
         return record.keys.size
     }
 }

@@ -1,5 +1,7 @@
 package com.example.scanner.data.repo
 
+import com.example.scanner.R
+import com.example.scanner.data.SQLITE_BATCHSIZE
 import com.example.scanner.data.dao.ProjectDao
 import com.example.scanner.data.entity.ProjectEntity
 import com.example.scanner.ui.viewmodel.ProjectAddUiModel
@@ -47,7 +49,13 @@ class ProjectRepository @Inject constructor(
             .filter { projectItemUiModel -> projectItemUiModel.itemChecked }
             .map { projectItemUiModel -> projectItemUiModel.projectId }
 
-        projectDao.deleteByIdList(toDeleteIdList)
+        val batchSize = SQLITE_BATCHSIZE
+
+        for (i in toDeleteIdList.indices step batchSize) {
+            val end = minOf(i + batchSize, toDeleteIdList.size)
+            val batch = toDeleteIdList.subList(i, end)
+            projectDao.deleteByIdList(batch)
+        }
     }
 
     suspend fun updateProjectFromUiModel(projectEditUiModel: ProjectEditUiModel) {

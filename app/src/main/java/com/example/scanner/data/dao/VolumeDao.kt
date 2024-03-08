@@ -15,6 +15,9 @@ interface VolumeDao {
     @Insert
     suspend fun insertOne(volumeEntity: VolumeEntity)
 
+    @Insert
+    suspend fun insertFromList(volumeEntityList: List<VolumeEntity>)
+
     @Query("DELETE FROM tb_volume WHERE volume_id in (:idList)")
     suspend fun deleteByIdList(idList: List<Int>)
 

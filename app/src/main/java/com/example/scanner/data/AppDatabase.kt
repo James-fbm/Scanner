@@ -10,6 +10,8 @@ import com.example.scanner.data.entity.ProjectEntity
 import com.example.scanner.data.entity.CollectionEntity
 import com.example.scanner.data.entity.VolumeEntity
 
+val SQLITE_BATCHSIZE = 100
+
 @Database(
     entities = [ProjectEntity::class, CollectionEntity::class, VolumeEntity::class],
     version = 1,

@@ -9,7 +9,7 @@ import java.util.Date
 
 @Entity(
     tableName = "tb_volume",
-    indices = [Index(value = ["volume_id"])],
+    indices = [Index(value = ["collection_id"])],
     foreignKeys = [ForeignKey(
         entity = CollectionEntity::class,
         parentColumns = arrayOf("collection_id"),

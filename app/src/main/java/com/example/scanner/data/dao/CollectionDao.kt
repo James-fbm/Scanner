@@ -13,7 +13,7 @@ interface CollectionDao {
     fun getCollectionByProjectId(projectId: Int): Flow<List<CollectionEntity>>
 
     @Insert
-    suspend fun insertOne(collectionEntity: CollectionEntity)
+    suspend fun insertOne(collectionEntity: CollectionEntity): Long
 
     @Query("DELETE FROM tb_collection WHERE collection_id in (:idList)")
     suspend fun deleteByIdList(idList: List<Int>)
