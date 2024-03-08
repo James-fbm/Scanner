@@ -5,8 +5,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.scanner.ui.component.collection.CollectionMain
 import com.example.scanner.ui.component.home.HomeMain
 import com.example.scanner.ui.component.project.ProjectMain
+import com.example.scanner.ui.viewmodel.CollectionViewModel
 import com.example.scanner.ui.viewmodel.ProjectViewModel
 
 @Composable
@@ -31,7 +33,20 @@ fun Navigation() {
 
             ProjectMain(
                 projectViewModel = projectViewModel,
-                onCollectionItemClicked = {_ -> }
+                onCollectionItemClicked = {collectionId ->
+                    navController.navigate("collection/${collectionId}")
+                }
+            )
+        }
+
+        composable("collection/{collectionId}") {backStackEntry ->
+            val collectionId = backStackEntry.arguments?.getString("collectionId")?.toIntOrNull() ?: 0
+            val collectionViewModel: CollectionViewModel = hiltViewModel()
+
+            collectionViewModel.setCollectionId(collectionId)
+            CollectionMain(
+                collectionViewModel = collectionViewModel,
+                onVolumeItemClicked = {_ -> }
             )
         }
     }

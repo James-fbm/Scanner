@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.scanner.data.AppDatabase
 import com.example.scanner.data.dao.ProjectDao
 import com.example.scanner.data.dao.CollectionDao
+import com.example.scanner.data.dao.VolumeDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,7 +30,12 @@ class AppModule {
     }
 
     @Provides
-    fun provideSetDao(appDatabase: AppDatabase): CollectionDao {
+    fun provideCollectionDao(appDatabase: AppDatabase): CollectionDao {
         return appDatabase.collectionDao()
+    }
+
+    @Provides
+    fun provideVolumeDao(appDatabase: AppDatabase): VolumeDao {
+        return appDatabase.volumeDao()
     }
 }

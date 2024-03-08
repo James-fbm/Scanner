@@ -62,7 +62,7 @@ fun ExcelImportDialog(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = (screenHeightDp * 0.40f).dp)
+                        .heightIn(max = (screenHeightDp * 0.35f).dp)
                         .padding(top = 8.dp, bottom = 4.dp)
                 ) {
                     items(excelImportUiModel.headerCheckedList.size) { index ->

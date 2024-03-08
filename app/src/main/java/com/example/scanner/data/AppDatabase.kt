@@ -5,11 +5,13 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.scanner.data.dao.ProjectDao
 import com.example.scanner.data.dao.CollectionDao
+import com.example.scanner.data.dao.VolumeDao
 import com.example.scanner.data.entity.ProjectEntity
 import com.example.scanner.data.entity.CollectionEntity
+import com.example.scanner.data.entity.VolumeEntity
 
 @Database(
-    entities = [ProjectEntity::class, CollectionEntity::class],
+    entities = [ProjectEntity::class, CollectionEntity::class, VolumeEntity::class],
     version = 1,
     exportSchema = false
 )
@@ -17,4 +19,5 @@ import com.example.scanner.data.entity.CollectionEntity
 abstract class AppDatabase: RoomDatabase() {
     abstract fun projectDao(): ProjectDao
     abstract fun collectionDao(): CollectionDao
+    abstract fun volumeDao(): VolumeDao
 }

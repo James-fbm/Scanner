@@ -26,7 +26,6 @@ fun ProjectMain(
     val projectUiState by projectViewModel.projectUiState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         projectViewModel.getCollectionList()
