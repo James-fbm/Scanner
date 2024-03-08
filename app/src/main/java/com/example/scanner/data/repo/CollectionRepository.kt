@@ -52,13 +52,7 @@ class CollectionRepository @Inject constructor(
             .filter { collectionItemUiModel -> collectionItemUiModel.itemChecked }
             .map { collectionItemUiModel -> collectionItemUiModel.collectionId }
 
-        val batchSize = SQLITE_BATCHSIZE
-
-        for (i in toDeleteIdList.indices step batchSize) {
-            val end = minOf(i + batchSize, toDeleteIdList.size)
-            val batch = toDeleteIdList.subList(i, end)
-            collectionDao.deleteByIdList(batch)
-        }
+        collectionDao.deleteByIdListInBatch(toDeleteIdList)
     }
 
     suspend fun updateCollectionFromUiModel(collectionEditUiModel: CollectionEditUiModel) {

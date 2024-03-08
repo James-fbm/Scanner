@@ -49,13 +49,7 @@ class ProjectRepository @Inject constructor(
             .filter { projectItemUiModel -> projectItemUiModel.itemChecked }
             .map { projectItemUiModel -> projectItemUiModel.projectId }
 
-        val batchSize = SQLITE_BATCHSIZE
-
-        for (i in toDeleteIdList.indices step batchSize) {
-            val end = minOf(i + batchSize, toDeleteIdList.size)
-            val batch = toDeleteIdList.subList(i, end)
-            projectDao.deleteByIdList(batch)
-        }
+        projectDao.deleteByIdListInBatch(toDeleteIdList)
     }
 
     suspend fun updateProjectFromUiModel(projectEditUiModel: ProjectEditUiModel) {

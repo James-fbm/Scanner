@@ -30,7 +30,7 @@ class CollectionViewModel @Inject constructor(
     }
 
     fun getVolumeList() {
-        val collectionId = _collectionId.value ?: run {
+        val collectionId = collectionId.value ?: run {
             _collectionUiState.value = CollectionUiState.Error
             return
         }
@@ -340,7 +340,7 @@ class CollectionViewModel @Inject constructor(
     }
 
     fun submitAddVolume(volumeAddUiModel: VolumeAddUiModel) {
-        val collectionId = _collectionId.value ?: run {
+        val collectionId = collectionId.value ?: run {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
@@ -372,10 +372,12 @@ class CollectionViewModel @Inject constructor(
     }
 
     fun submitDeleteVolume() {
-        viewModelScope.launch(Dispatchers.IO) {
+        val volumeItemUiModelList = (_collectionUiState.value as CollectionUiState.Success).volumeItemUiModelList
+        _collectionUiState.value = CollectionUiState.Loading
 
+        viewModelScope.launch(Dispatchers.IO) {
             volumeRepository.deleteVolumeFromUiModelList(
-                (_collectionUiState.value as CollectionUiState.Success).volumeItemUiModelList
+                volumeItemUiModelList
             )
         }
     }

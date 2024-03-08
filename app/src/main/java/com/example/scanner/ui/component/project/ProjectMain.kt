@@ -24,6 +24,7 @@ fun ProjectMain(
     onCollectionItemClicked: (Int) -> Unit
 ) {
     val projectUiState by projectViewModel.projectUiState.collectAsState()
+    val externalUiDependency by projectViewModel.externalUiDependency.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -35,116 +36,120 @@ fun ProjectMain(
         }
     }
 
-    when(projectUiState) {
-        ProjectUiState.Error -> Error()
-        ProjectUiState.Loading -> Loading()
-        is ProjectUiState.Success -> {
-            Scaffold(
-                topBar = {
-                    ProjectTopNavigator(
-                        projectTopSearchBarUiModel =
-                        (projectUiState as ProjectUiState.Success).projectTopSearchBarUiModel,
-                        onSearchBarActiveChanged = {
-                            projectViewModel.switchTopSearchBarActiveState()
+    if (externalUiDependency) {
+        Loading()
+    } else {
+        when(projectUiState) {
+            ProjectUiState.Error -> Error()
+            ProjectUiState.Loading -> Loading()
+            is ProjectUiState.Success -> {
+                Scaffold(
+                    topBar = {
+                        ProjectTopNavigator(
+                            projectTopSearchBarUiModel =
+                            (projectUiState as ProjectUiState.Success).projectTopSearchBarUiModel,
+                            onSearchBarActiveChanged = {
+                                projectViewModel.switchTopSearchBarActiveState()
+                            },
+                            onSearchBarInputChanged = { topSearchBarInput ->
+                                projectViewModel.updateTopSearchBarInput(topSearchBarInput)
+                            }
+                        )
+                        SnackbarHost(hostState = snackbarHostState)
+                    },
+                    bottomBar = {
+                        ProjectBottomButtonGroup(
+                            collectionItemDeleteEnabled =
+                            (projectUiState as ProjectUiState.Success).collectionItemDeleteEnabled,
+                            onAddDialogVisibleChanged = {
+                                projectViewModel.switchCollectionAddDialogVisibility()
+                            },
+                            onDeleteDialogVisibleChanged = {
+                                projectViewModel.switchCollectionDeleteDialogVisibility()
+                            },
+                            parseExcelHeader =  { fileMeta ->
+                                projectViewModel.parseExcelHeader(fileMeta)
+                            }
+                        )
+                    }
+                ) {innerPadding ->
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .padding(top = 12.dp)
+                    ) {
+                        CollectionDisplayBody(
+                            allCollectionItemCheckedState = (projectUiState as ProjectUiState.Success).allCollectionItemCheckedState,
+                            collectionItemUiModelList = (projectUiState as ProjectUiState.Success).collectionItemUiModelList,
+                            onItemClicked = onCollectionItemClicked,
+                            onAllItemCheckedStateChanged = { checkedState ->
+                                projectViewModel.switchAllCollectionItemCheckedState(checkedState)
+                            },
+                            onItemCheckedChanged = { collectionItemUiModel ->
+                                projectViewModel.switchCollectionItemCheckedState(collectionItemUiModel)
+                            },
+                            onMenuVisibleChanged = { collectionItemUiModel ->
+                                projectViewModel.switchCollectionItemMenuVisibility(collectionItemUiModel)
+                            },
+                            onEditDialogVisibleChanged = {collectionItemUiModel ->
+                                projectViewModel.switchCollectionEditDialogVisibility(collectionItemUiModel)
+                            }
+                        )
+                    }
+
+                    CollectionEditDialog(
+                        collectionEditUiModel = (projectUiState as ProjectUiState.Success).collectionEditUiModel,
+                        onDialogVisibleChanged = { collectionItemUiModel ->
+                            projectViewModel.switchCollectionEditDialogVisibility(collectionItemUiModel)
                         },
-                        onSearchBarInputChanged = { topSearchBarInput ->
-                            projectViewModel.updateTopSearchBarInput(topSearchBarInput)
+                        onDialogCollectionNameInputChanged = {inputName ->
+                            projectViewModel.updateEditDialogCollectionNameInput(inputName)
+                        },
+                        onEditRequestSubmitted = {collectionEditUiModel ->
+                            projectViewModel.submitUpdateCollection(collectionEditUiModel)
                         }
                     )
-                    SnackbarHost(hostState = snackbarHostState)
-                },
-                bottomBar = {
-                    ProjectBottomButtonGroup(
-                        collectionItemDeleteEnabled =
-                        (projectUiState as ProjectUiState.Success).collectionItemDeleteEnabled,
-                        onAddDialogVisibleChanged = {
+
+                    CollectionAddDialog(
+                        collectionAddUiModel = (projectUiState as ProjectUiState.Success).collectionAddUiModel,
+                        onDialogVisibleChanged = {
                             projectViewModel.switchCollectionAddDialogVisibility()
                         },
-                        onDeleteDialogVisibleChanged = {
+                        onDialogCollectionNameInputChanged = {inputName ->
+                            projectViewModel.updateAddDialogCollectionNameInput(inputName)
+                        },
+                        onAddRequestSubmitted = { collectionAddUiModel ->
+                            projectViewModel.submitAddCollection(collectionAddUiModel)
+                        }
+                    )
+
+                    CollectionDeleteDialog(
+                        collectionDeleteUiModel = (projectUiState as ProjectUiState.Success).collectionDeleteUiModel,
+                        onDialogVisibleChanged = {
                             projectViewModel.switchCollectionDeleteDialogVisibility()
                         },
-                        parseExcelHeader =  { fileMeta ->
-                            projectViewModel.parseExcelHeader(fileMeta)
+                        onDeleteRequestSubmitted = {
+                            projectViewModel.submitDeleteCollection()
+                        }
+                    )
+
+                    ExcelImportDialog(
+                        excelImportUiModel = (projectUiState as ProjectUiState.Success).excelImportUiModel,
+                        onHeaderCheckedStateChanged = {index ->
+                            projectViewModel.switchExcelHeaderCheckedState(index)
+                        },
+                        onDialogVisibleChanged = {
+                            projectViewModel.closeExcelImportDialog()
+                        },
+                        onExcelImportAliasChanged = { inputAlias ->
+                            projectViewModel.updateExcelImportAliasInput(inputAlias)
+                        },
+                        onImportRequestSubmitted = {excelImportUiModel ->
+                            projectViewModel.submitImportExcel(excelImportUiModel)
                         }
                     )
                 }
-            ) {innerPadding ->
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .padding(top = 12.dp)
-                ) {
-                    CollectionDisplayBody(
-                        allCollectionItemCheckedState = (projectUiState as ProjectUiState.Success).allCollectionItemCheckedState,
-                        collectionItemUiModelList = (projectUiState as ProjectUiState.Success).collectionItemUiModelList,
-                        onItemClicked = onCollectionItemClicked,
-                        onAllItemCheckedStateChanged = { checkedState ->
-                            projectViewModel.switchAllCollectionItemCheckedState(checkedState)
-                        },
-                        onItemCheckedChanged = { collectionItemUiModel ->
-                            projectViewModel.switchCollectionItemCheckedState(collectionItemUiModel)
-                        },
-                        onMenuVisibleChanged = { collectionItemUiModel ->
-                            projectViewModel.switchCollectionItemMenuVisibility(collectionItemUiModel)
-                        },
-                        onEditDialogVisibleChanged = {collectionItemUiModel ->
-                            projectViewModel.switchCollectionEditDialogVisibility(collectionItemUiModel)
-                        }
-                    )
-                }
-
-                CollectionEditDialog(
-                    collectionEditUiModel = (projectUiState as ProjectUiState.Success).collectionEditUiModel,
-                    onDialogVisibleChanged = { collectionItemUiModel ->
-                        projectViewModel.switchCollectionEditDialogVisibility(collectionItemUiModel)
-                    },
-                    onDialogCollectionNameInputChanged = {inputName ->
-                        projectViewModel.updateEditDialogCollectionNameInput(inputName)
-                    },
-                    onEditRequestSubmitted = {collectionEditUiModel ->
-                        projectViewModel.submitUpdateCollection(collectionEditUiModel)
-                    }
-                )
-
-                CollectionAddDialog(
-                    collectionAddUiModel = (projectUiState as ProjectUiState.Success).collectionAddUiModel,
-                    onDialogVisibleChanged = {
-                        projectViewModel.switchCollectionAddDialogVisibility()
-                    },
-                    onDialogCollectionNameInputChanged = {inputName ->
-                        projectViewModel.updateAddDialogCollectionNameInput(inputName)
-                    },
-                    onAddRequestSubmitted = { collectionAddUiModel ->
-                        projectViewModel.submitAddCollection(collectionAddUiModel)
-                    }
-                )
-
-                CollectionDeleteDialog(
-                    collectionDeleteUiModel = (projectUiState as ProjectUiState.Success).collectionDeleteUiModel,
-                    onDialogVisibleChanged = {
-                        projectViewModel.switchCollectionDeleteDialogVisibility()
-                    },
-                    onDeleteRequestSubmitted = {
-                        projectViewModel.submitDeleteCollection()
-                    }
-                )
-
-                ExcelImportDialog(
-                    excelImportUiModel = (projectUiState as ProjectUiState.Success).excelImportUiModel,
-                    onHeaderCheckedStateChanged = {index ->
-                        projectViewModel.switchExcelHeaderCheckedState(index)
-                    },
-                    onDialogVisibleChanged = {
-                        projectViewModel.closeExcelImportDialog()
-                    },
-                    onExcelImportAliasChanged = { inputAlias ->
-                        projectViewModel.updateExcelImportAliasInput(inputAlias)
-                    },
-                    onImportRequestSubmitted = {excelImportUiModel ->
-                        projectViewModel.submitImportExcel(excelImportUiModel)
-                    }
-                )
             }
         }
     }

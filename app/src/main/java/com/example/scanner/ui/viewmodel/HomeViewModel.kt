@@ -356,10 +356,12 @@ class HomeViewModel @Inject constructor(
     }
 
     fun submitDeleteProject() {
+        val projectItemUiModelList = (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
+        _homeUiState.value = HomeUiState.Loading
         viewModelScope.launch(Dispatchers.IO) {
 
             projectRepository.deleteProjectFromUiModelList(
-                (_homeUiState.value as HomeUiState.Success).projectItemUiModelList
+                projectItemUiModelList
             )
         }
     }

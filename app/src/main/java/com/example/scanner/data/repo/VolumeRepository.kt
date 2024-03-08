@@ -49,13 +49,7 @@ class VolumeRepository @Inject constructor(
             .filter { volumeItemUiModel -> volumeItemUiModel.itemChecked }
             .map { volumeItemUiModel -> volumeItemUiModel.volumeId }
 
-        val batchSize = SQLITE_BATCHSIZE
-
-        for (i in toDeleteIdList.indices step batchSize) {
-            val end = minOf(i + batchSize, toDeleteIdList.size)
-            val batch = toDeleteIdList.subList(i, end)
-            volumeDao.deleteByIdList(batch)
-        }
+        volumeDao.deleteByIdListInBatch(toDeleteIdList)
     }
 
     suspend fun updateVolumeFromUiModel(volumeEditUiModel: VolumeEditUiModel) {

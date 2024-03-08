@@ -24,6 +24,18 @@ class ProjectViewModel @Inject constructor(
     val projectUiState: StateFlow<ProjectUiState>
         get() = _projectUiState
 
+    // if ui response depends on other page's data update
+    // this variable should be set to true in order to delay ui response
+    private val _externalUiDependency: MutableStateFlow<Boolean> =
+        MutableStateFlow(false)
+    val externalUiDependency: StateFlow<Boolean>
+        get() = _externalUiDependency
+
+    private val _projectUiStateCache: MutableStateFlow<ProjectUiState> =
+        MutableStateFlow(ProjectUiState.Loading)
+    val projectUiStateCache: StateFlow<ProjectUiState>
+        get() = _projectUiState
+
     private val _projectId = MutableLiveData<Int>(0)
     val projectId: LiveData<Int> = _projectId
 
@@ -504,7 +516,7 @@ class ProjectViewModel @Inject constructor(
     }
 
     fun submitAddCollection(collectionAddUiModel: CollectionAddUiModel) {
-        val projectId = _projectId.value ?: run {
+        val projectId = projectId.value ?: run {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
@@ -513,10 +525,12 @@ class ProjectViewModel @Inject constructor(
     }
 
     fun submitDeleteCollection() {
-        viewModelScope.launch(Dispatchers.IO) {
+        val collectionItemUiModelList = (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList
+        _projectUiState.value = ProjectUiState.Loading
 
+        viewModelScope.launch(Dispatchers.IO) {
             collectionRepository.deleteCollectionFromUiModelList(
-                (_projectUiState.value as ProjectUiState.Success).collectionItemUiModelList
+                collectionItemUiModelList
             )
         }
     }
@@ -529,13 +543,15 @@ class ProjectViewModel @Inject constructor(
     }
 
     fun submitImportExcel(excelImportUiModel: ExcelImportUiModel) {
-        val projectId = _projectId.value ?: run {
+        val projectId = projectId.value ?: run {
             return
         }
 
         _projectUiState.value = ProjectUiState.Loading
 
         viewModelScope.launch(Dispatchers.IO) {
+            _externalUiDependency.value = true
+
             val startTime = System.currentTimeMillis()
 
             val indexIdArray = excelImportUiModel.headerCheckedList.mapIndexedNotNull { index, pair ->
@@ -543,12 +559,11 @@ class ProjectViewModel @Inject constructor(
             }.toIntArray()
 
             val elementCount = collectionRepository.importCollectionFromExcelFile(projectId, excelImportUiModel, indexIdArray)
+            _externalUiDependency.value = false
 
             val endTime = System.currentTimeMillis()
             val elapsedTime = endTime - startTime
-
-            getCollectionList()
-
+            
             snackbarMessageChannel.send("Import $elementCount elements in $elapsedTime ms")
         }
     }
