@@ -30,6 +30,7 @@ fun VolumeItem (
     onItemCheckedChanged: (VolumeItemUiModel) -> Unit,
     onMenuVisibleChanged: (VolumeItemUiModel) -> Unit,
     onEditDialogVisibleChanged: (VolumeItemUiModel?) -> Unit,
+    onViewDialogVisibleChanged: (VolumeItemUiModel?) -> Unit
 ) {
     ListItem(
         modifier = Modifier.clickable {
@@ -91,7 +92,17 @@ fun VolumeItem (
                             onEditDialogVisibleChanged(volumeItemUiModel)
                         }
                     )
-                    // Add more items as needed
+                    DropdownMenuItem(
+                        text = { Text("View") },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Outlined.Edit,
+                                contentDescription = null
+                            )},
+                        onClick = {
+                            onViewDialogVisibleChanged(volumeItemUiModel)
+                        }
+                    )
                 }
             }
         }

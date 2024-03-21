@@ -79,6 +79,9 @@ fun CollectionMain(
                         },
                         onEditDialogVisibleChanged = {volumeItemUiModel ->
                             collectionViewModel.switchVolumeEditDialogVisibility(volumeItemUiModel)
+                        },
+                        onViewDialogVisibleChanged = {volumeItemUiModel ->
+                            collectionViewModel.switchVolumeViewDialogVisibility(volumeItemUiModel)
                         }
                     )
                 }
@@ -116,6 +119,13 @@ fun CollectionMain(
                     },
                     onDeleteRequestSubmitted = {
                         collectionViewModel.submitDeleteVolume()
+                    }
+                )
+
+                VolumeViewDialog(
+                    volumeViewUiModel = (collectionUiState as CollectionUiState.Success).volumeViewUiModel,
+                    onDialogVisibleChanged = {
+                        collectionViewModel.switchVolumeViewDialogVisibility(null)
                     }
                 )
             }

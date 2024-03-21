@@ -53,14 +53,8 @@ void thread_copy_record(JavaVM* jvm, jobject recordMap, jmethodID mapPutMethod,
     JNIEnv* env = nullptr;
     jvm->AttachCurrentThread(&env, nullptr);
 
-
     for (auto entry = start ; entry != end ; ++entry) {
-        jobjectArray keyArray = env->NewObjectArray(entry->first.size(), env->FindClass("java/lang/String"), nullptr);
-        for (size_t i = 0; i < entry->first.size(); ++i) {
-            jstring stringKey = env->NewStringUTF(entry->first[i].c_str());
-            env->SetObjectArrayElement(keyArray, i, stringKey);
-            env->DeleteLocalRef(stringKey);
-        }
+        jstring keyString = env->NewStringUTF(entry->first.c_str());
 
         jobjectArray valueArray = env->NewObjectArray(entry->second.size(), env->FindClass("java/lang/String"), nullptr);
         for (size_t i = 0; i < entry->second.size(); ++i) {
@@ -69,8 +63,8 @@ void thread_copy_record(JavaVM* jvm, jobject recordMap, jmethodID mapPutMethod,
             env->DeleteLocalRef(stringValue);
         }
 
-        env->CallObjectMethod(recordMap, mapPutMethod, keyArray, valueArray);
-        env->DeleteLocalRef(keyArray);
+        env->CallObjectMethod(recordMap, mapPutMethod, keyString, valueArray);
+        env->DeleteLocalRef(keyString);
         env->DeleteLocalRef(valueArray);
     }
 
@@ -149,4 +143,24 @@ Java_com_example_scanner_data_repo_CollectionRepositoryKt_readExcelRecord(
 
     env->DeleteGlobalRef(globalRecordMap);
     return recordMap;
+}
+
+
+extern "C"
+JNIEXPORT jobjectArray JNICALL
+Java_com_example_scanner_data_repo_CollectionRepositoryKt_csvLineToArray(JNIEnv* env, jclass, jstring csvLine) {
+    const char *csv_line = env->GetStringUTFChars(csvLine, nullptr);
+    auto line_array = read_csvline(csv_line, false, "");
+
+    jclass stringClass = env->FindClass("java/lang/String");
+    jobjectArray lineArray = env->NewObjectArray(line_array.size(), stringClass, nullptr);
+
+    for (size_t i = 0; i < line_array.size(); ++i) {
+        jstring stringValue = env->NewStringUTF(line_array[i].c_str());
+        env->SetObjectArrayElement(lineArray, i, stringValue);
+        env->DeleteLocalRef(stringValue);
+    }
+
+    env->ReleaseStringUTFChars(csvLine, csv_line);
+    return lineArray;
 }

@@ -52,6 +52,11 @@ class CollectionViewModel @Inject constructor(
                         "",
                         false
                     ),
+                    volumeViewUiModel = VolumeViewUiModel(
+                        "",
+                        emptyMap(),
+                        false
+                    ),
                     volumeDeleteUiModel = VolumeDeleteUiModel(
                         false
                     ),
@@ -116,6 +121,7 @@ class CollectionViewModel @Inject constructor(
                 (_collectionUiState.value as CollectionUiState.Success).collectionTopSearchBarUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeAddUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeEditUiModel,
+                (_collectionUiState.value as CollectionUiState.Success).volumeViewUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeDeleteUiModel,
                 newItemList
             )
@@ -151,6 +157,7 @@ class CollectionViewModel @Inject constructor(
                 (_collectionUiState.value as CollectionUiState.Success).collectionTopSearchBarUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeAddUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeEditUiModel,
+                (_collectionUiState.value as CollectionUiState.Success).volumeViewUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeDeleteUiModel,
                 newItemList
             )
@@ -179,6 +186,7 @@ class CollectionViewModel @Inject constructor(
                 (_collectionUiState.value as CollectionUiState.Success).collectionTopSearchBarUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeAddUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeEditUiModel,
+                (_collectionUiState.value as CollectionUiState.Success).volumeViewUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeDeleteUiModel,
                 newItemList
             )
@@ -199,6 +207,7 @@ class CollectionViewModel @Inject constructor(
                 newSearchBarUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeAddUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeEditUiModel,
+                (_collectionUiState.value as CollectionUiState.Success).volumeViewUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeDeleteUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeItemUiModelList
             )
@@ -223,6 +232,7 @@ class CollectionViewModel @Inject constructor(
                 newSearchBarUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeAddUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeEditUiModel,
+                (_collectionUiState.value as CollectionUiState.Success).volumeViewUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeDeleteUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeItemUiModelList
             )
@@ -248,6 +258,7 @@ class CollectionViewModel @Inject constructor(
                     (_collectionUiState.value as CollectionUiState.Success).collectionTopSearchBarUiModel,
                     (_collectionUiState.value as CollectionUiState.Success).volumeAddUiModel,
                     newEditUiModel,
+                    (_collectionUiState.value as CollectionUiState.Success).volumeViewUiModel,
                     (_collectionUiState.value as CollectionUiState.Success).volumeDeleteUiModel,
                     (_collectionUiState.value as CollectionUiState.Success).volumeItemUiModelList
                 )
@@ -271,6 +282,55 @@ class CollectionViewModel @Inject constructor(
                     (_collectionUiState.value as CollectionUiState.Success).collectionTopSearchBarUiModel,
                     (_collectionUiState.value as CollectionUiState.Success).volumeAddUiModel,
                     newEditUiModel,
+                    (_collectionUiState.value as CollectionUiState.Success).volumeViewUiModel,
+                    (_collectionUiState.value as CollectionUiState.Success).volumeDeleteUiModel,
+                    (_collectionUiState.value as CollectionUiState.Success).volumeItemUiModelList
+                )
+            }
+        }
+    }
+
+    fun switchVolumeViewDialogVisibility(volumeItemUiModel: VolumeItemUiModel?) {
+        viewModelScope.launch {
+            if (volumeItemUiModel == null) {
+
+                // called by dialog cancel button
+                // clear all the input and close the dialog
+
+                val newViewUiModel = VolumeViewUiModel(
+                    volumeName = "",
+                    volumeSource = emptyMap(),
+                    dialogVisible = false
+                )
+
+                _collectionUiState.value = CollectionUiState.Success(
+                    (_collectionUiState.value as CollectionUiState.Success).allVolumeItemCheckedState,
+                    (_collectionUiState.value as CollectionUiState.Success).volumeItemDeleteEnabled,
+                    (_collectionUiState.value as CollectionUiState.Success).collectionTopSearchBarUiModel,
+                    (_collectionUiState.value as CollectionUiState.Success).volumeAddUiModel,
+                    (_collectionUiState.value as CollectionUiState.Success).volumeEditUiModel,
+                    newViewUiModel,
+                    (_collectionUiState.value as CollectionUiState.Success).volumeDeleteUiModel,
+                    (_collectionUiState.value as CollectionUiState.Success).volumeItemUiModelList
+                )
+            } else {
+                switchVolumeItemMenuVisibility(volumeItemUiModel)
+
+                val sourceMap = volumeRepository.getVolumeSourceMapFromUiModel(volumeItemUiModel)
+
+                val newViewUiModel = VolumeViewUiModel(
+                    volumeName = "",
+                    volumeSource = sourceMap,
+                    dialogVisible = true
+                )
+
+                _collectionUiState.value = CollectionUiState.Success(
+                    (_collectionUiState.value as CollectionUiState.Success).allVolumeItemCheckedState,
+                    (_collectionUiState.value as CollectionUiState.Success).volumeItemDeleteEnabled,
+                    (_collectionUiState.value as CollectionUiState.Success).collectionTopSearchBarUiModel,
+                    (_collectionUiState.value as CollectionUiState.Success).volumeAddUiModel,
+                    (_collectionUiState.value as CollectionUiState.Success).volumeEditUiModel,
+                    newViewUiModel,
                     (_collectionUiState.value as CollectionUiState.Success).volumeDeleteUiModel,
                     (_collectionUiState.value as CollectionUiState.Success).volumeItemUiModelList
                 )
@@ -294,6 +354,7 @@ class CollectionViewModel @Inject constructor(
                 (_collectionUiState.value as CollectionUiState.Success).collectionTopSearchBarUiModel,
                 newAddUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeEditUiModel,
+                (_collectionUiState.value as CollectionUiState.Success).volumeViewUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeDeleteUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeItemUiModelList
             )
@@ -313,6 +374,7 @@ class CollectionViewModel @Inject constructor(
                 (_collectionUiState.value as CollectionUiState.Success).collectionTopSearchBarUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeAddUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeEditUiModel,
+                (_collectionUiState.value as CollectionUiState.Success).volumeViewUiModel,
                 newDeleteUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeItemUiModelList
             )
@@ -333,6 +395,7 @@ class CollectionViewModel @Inject constructor(
                 (_collectionUiState.value as CollectionUiState.Success).collectionTopSearchBarUiModel,
                 newVolumeAddUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeEditUiModel,
+                (_collectionUiState.value as CollectionUiState.Success).volumeViewUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeDeleteUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeItemUiModelList
             )
@@ -365,6 +428,7 @@ class CollectionViewModel @Inject constructor(
                 (_collectionUiState.value as CollectionUiState.Success).collectionTopSearchBarUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeAddUiModel,
                 newEditUiModel,
+                (_collectionUiState.value as CollectionUiState.Success).volumeViewUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeDeleteUiModel,
                 (_collectionUiState.value as CollectionUiState.Success).volumeItemUiModelList
             )
@@ -414,6 +478,12 @@ data class VolumeEditUiModel (
     val dialogVisible: Boolean
 )
 
+data class VolumeViewUiModel (
+    val volumeName: String,
+    val volumeSource: Map<String, String>,
+    val dialogVisible: Boolean
+)
+
 data class VolumeDeleteUiModel (
     val dialogVisible: Boolean
 )
@@ -425,6 +495,7 @@ sealed class CollectionUiState {
         val collectionTopSearchBarUiModel: CollectionTopSearchBarUiModel,
         val volumeAddUiModel: VolumeAddUiModel,
         val volumeEditUiModel: VolumeEditUiModel,
+        val volumeViewUiModel: VolumeViewUiModel,
         val volumeDeleteUiModel: VolumeDeleteUiModel,
         val volumeItemUiModelList: List<VolumeItemUiModel>
     ): CollectionUiState()

@@ -59,4 +59,8 @@ class VolumeRepository @Inject constructor(
         val modifyTime = Date()
         volumeDao.updateOne(volumeId, volumeName, modifyTime)
     }
+
+    suspend fun getVolumeSourceMapFromUiModel(volumeItemUiModel: VolumeItemUiModel): Map<String, String> {
+        return emptyMap()
+    }
 }

@@ -30,6 +30,7 @@ fun VolumeDisplayBody(
     onItemCheckedChanged: (VolumeItemUiModel) -> Unit,
     onMenuVisibleChanged: (VolumeItemUiModel) -> Unit,
     onEditDialogVisibleChanged: (VolumeItemUiModel?) -> Unit,
+    onViewDialogVisibleChanged: (VolumeItemUiModel?) -> Unit
 ) {
 
     // Select all checkbox and filter button on the top of the list
@@ -70,7 +71,8 @@ fun VolumeDisplayBody(
                 onItemClicked = onItemClicked,
                 onItemCheckedChanged = onItemCheckedChanged,
                 onMenuVisibleChanged = onMenuVisibleChanged,
-                onEditDialogVisibleChanged = onEditDialogVisibleChanged
+                onEditDialogVisibleChanged = onEditDialogVisibleChanged,
+                onViewDialogVisibleChanged = onViewDialogVisibleChanged
             )
             Spacer(modifier = Modifier.height(4.dp))
         }

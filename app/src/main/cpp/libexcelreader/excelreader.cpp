@@ -162,18 +162,15 @@ IndexRecord read_csvrecord(const char *file_path, const std::vector<int> &index_
             index_element.push_back(line_element[id]);
         }
 
-        // record all the rows of a set of index
-//        if (index_record.find(index_element) == index_record.end()) {
-//            index_record[index_element] = std::vector<std::vector<std::string>>();
-//        }
-        if (index_record[index_element].size() == 6) {
-            // only remain first three and last three elements
-            index_record[index_element][3] = index_record[index_element][4];
-            index_record[index_element][4] = index_record[index_element][5];
-            index_record[index_element].pop_back();
-        }
-        index_record[index_element].push_back(to_csvline(line_element));
+        auto index_line = to_csvline(index_element);
 
+        if (index_record[index_line].size() == 6) {
+            // only remain first three and last three elements
+            index_record[index_line][3] = index_record[index_line][4];
+            index_record[index_line][4] = index_record[index_line][5];
+            index_record[index_line].pop_back();
+        }
+        index_record[index_line].push_back(to_csvline(line_element));
     }
 
     return index_record;

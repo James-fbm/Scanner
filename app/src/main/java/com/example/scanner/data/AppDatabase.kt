@@ -9,11 +9,14 @@ import com.example.scanner.data.dao.VolumeDao
 import com.example.scanner.data.entity.ProjectEntity
 import com.example.scanner.data.entity.CollectionEntity
 import com.example.scanner.data.entity.VolumeEntity
+import com.example.scanner.data.entity.VolumeSourceEntity
+import com.example.scanner.data.entity.VolumeTitleEntity
 
-val SQLITE_BATCHSIZE = 999
+const val SQLITE_BATCHSIZE = 999
 
 @Database(
-    entities = [ProjectEntity::class, CollectionEntity::class, VolumeEntity::class],
+    entities = [ProjectEntity::class, CollectionEntity::class, VolumeEntity::class,
+        VolumeSourceEntity::class, VolumeTitleEntity::class],
     version = 1,
     exportSchema = false
 )

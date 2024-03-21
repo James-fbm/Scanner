@@ -1,7 +1,5 @@
 package com.example.scanner.data.repo
 
-import com.example.scanner.R
-import com.example.scanner.data.SQLITE_BATCHSIZE
 import com.example.scanner.data.dao.CollectionDao
 import com.example.scanner.data.dao.VolumeDao
 import com.example.scanner.data.entity.CollectionEntity
@@ -78,18 +76,19 @@ class CollectionRepository @Inject constructor(
 
         val newCollectionId = collectionDao.insertOne(collectionEntity)
         val toInsertVolumeList: List<VolumeEntity> = record.map {r ->
-            var volumeIndex: String = ""
-            for ((index, e) in r.key.withIndex()) {
-                volumeIndex += e
-                if (index != r.key.size - 1) {
-                    volumeIndex += '_'
+            var volumeName: String = ""
+            val keyArray = csvLineToArray(r.key)
+            for ((index, e) in keyArray.withIndex()) {
+                volumeName += e
+                if (index != keyArray.size - 1) {
+                    volumeName += '_'
                 }
             }
 
             VolumeEntity(
                 // id will be ignored here
                 volumeId = 0,
-                volumeName = volumeIndex,
+                volumeName = volumeName,
                 volumeSource = "",
                 collectionId = newCollectionId.toInt(),
                 createTime = Date(),
@@ -102,5 +101,6 @@ class CollectionRepository @Inject constructor(
     }
 }
 
-typealias IndexRecord = Map<Array<String>, Array<String>>?
+typealias IndexRecord = Map<String, Array<String>>?
 external fun readExcelRecord(filePath: String, fileType: String, indexIdArray: IntArray): IndexRecord
+external fun csvLineToArray(csvLine: String): Array<String>
