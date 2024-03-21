@@ -12,8 +12,9 @@
 
 // key: header that user selects as index columns
 // value: all the row records of a certain index column set
-using IndexRecord = std::map<std::vector<std::string>, std::vector<std::vector<std::string>>>;
+using IndexRecord = std::map<std::vector<std::string>, std::vector<std::string>>;
 
 std::vector<std::string> read_csvline(const char *, bool, const char *);
 std::vector<std::string> read_csvheader(const char *);
 IndexRecord read_csvrecord(const char *, const std::vector<int> &);
+std::string to_csvline(std::vector<std::string>& record_array);

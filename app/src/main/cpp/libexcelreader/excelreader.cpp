@@ -163,18 +163,46 @@ IndexRecord read_csvrecord(const char *file_path, const std::vector<int> &index_
         }
 
         // record all the rows of a set of index
-        if (index_record.find(index_element) == index_record.end()) {
-            index_record[index_element] = std::vector<std::vector<std::string>>();
-        }
+//        if (index_record.find(index_element) == index_record.end()) {
+//            index_record[index_element] = std::vector<std::vector<std::string>>();
+//        }
         if (index_record[index_element].size() == 6) {
             // only remain first three and last three elements
             index_record[index_element][3] = index_record[index_element][4];
             index_record[index_element][4] = index_record[index_element][5];
             index_record[index_element].pop_back();
         }
-        index_record[index_element].push_back(line_element);
+        index_record[index_element].push_back(to_csvline(line_element));
 
     }
 
     return index_record;
+}
+
+std::string to_csvline(std::vector<std::string>& record_array) {
+    std::string record_line;
+    bool quoting = false;
+    for (auto record_element = record_array.cbegin() ; record_element != record_array.cend() ; ++record_element) {
+        // check and process if the element has special characters
+        if (record_element != record_array.cbegin()) {
+            record_line += ',';
+        }
+        std::string element_process;
+        for (auto ch: *record_element) {
+            if (ch == '"' || ch == '\r' || ch == '\n' || ch == ',') {
+                quoting = true;
+                if (ch == '"') {
+                    element_process += '"';
+                }
+            }
+            element_process += ch;
+        }
+        if (quoting) {
+            element_process.insert(0, "\"").append("\"");
+            quoting = false;
+        }
+        record_line += element_process;
+    }
+
+    return record_line;
 }

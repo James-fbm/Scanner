@@ -62,16 +62,11 @@ void thread_copy_record(JavaVM* jvm, jobject recordMap, jmethodID mapPutMethod,
             env->DeleteLocalRef(stringKey);
         }
 
-        jobjectArray valueArray = env->NewObjectArray(entry->second.size(), env->FindClass("[Ljava/lang/String;"), nullptr);
+        jobjectArray valueArray = env->NewObjectArray(entry->second.size(), env->FindClass("java/lang/String"), nullptr);
         for (size_t i = 0; i < entry->second.size(); ++i) {
-            jobjectArray innerArray = env->NewObjectArray(entry->second[i].size(), env->FindClass("java/lang/String"), nullptr);
-            for (size_t j = 0; j < entry->second[i].size(); ++j) {
-                jstring stringValue = env->NewStringUTF(entry->second[i][j].c_str());
-                env->SetObjectArrayElement(innerArray, j, stringValue);
-                env->DeleteLocalRef(stringValue);
-            }
-            env->SetObjectArrayElement(valueArray, i, innerArray);
-            env->DeleteLocalRef(innerArray);
+            jstring stringValue = env->NewStringUTF(entry->second[i].c_str());
+            env->SetObjectArrayElement(valueArray, i, stringValue);
+            env->DeleteLocalRef(stringValue);
         }
 
         env->CallObjectMethod(recordMap, mapPutMethod, keyArray, valueArray);

@@ -102,5 +102,5 @@ class CollectionRepository @Inject constructor(
     }
 }
 
-typealias IndexRecord = Map<Array<String>, Array<Array<String>>>?
+typealias IndexRecord = Map<Array<String>, Array<String>>?
 external fun readExcelRecord(filePath: String, fileType: String, indexIdArray: IntArray): IndexRecord
