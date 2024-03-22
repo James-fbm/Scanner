@@ -26,9 +26,6 @@ data class VolumeEntity (
     @ColumnInfo("volume_name")
     val volumeName: String,
 
-    @ColumnInfo("volume_source")
-    val volumeSource: String,
-
     @ColumnInfo("collection_id")
     val collectionId: Int,
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scanner.data.repo.CollectionRepository
+import com.example.scanner.readExcelHeader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -622,5 +623,3 @@ sealed class ProjectUiState {
     data object Loading: ProjectUiState()
     data object Error: ProjectUiState()
 }
-
-external fun readExcelHeader(filePath: String, fileType: String): Array<String>?

@@ -5,7 +5,7 @@
 
 extern "C"
 JNIEXPORT jobjectArray JNICALL
-Java_com_example_scanner_ui_viewmodel_ProjectViewModelKt_readExcelHeader(
+Java_com_example_scanner_MainActivityKt_readExcelHeader(
         JNIEnv* env, jclass, jstring jFilePath, jstring jFileType) {
 
     const char *file_path = env->GetStringUTFChars(jFilePath, nullptr);
@@ -74,7 +74,7 @@ void thread_copy_record(JavaVM* jvm, jobject recordMap, jmethodID mapPutMethod,
 
 extern "C"
 JNIEXPORT jobject JNICALL
-Java_com_example_scanner_data_repo_CollectionRepositoryKt_readExcelRecord(
+Java_com_example_scanner_MainActivityKt_readExcelRecord(
         JNIEnv* env, jclass, jstring jFilePath, jstring jFileType, jintArray indexIdArray) {
     const char *file_path = env->GetStringUTFChars(jFilePath, nullptr);
     const char *file_type = env->GetStringUTFChars(jFileType, nullptr);
@@ -148,7 +148,7 @@ Java_com_example_scanner_data_repo_CollectionRepositoryKt_readExcelRecord(
 
 extern "C"
 JNIEXPORT jobjectArray JNICALL
-Java_com_example_scanner_data_repo_CollectionRepositoryKt_csvLineToArray(JNIEnv* env, jclass, jstring csvLine) {
+Java_com_example_scanner_MainActivityKt_csvLineToArray(JNIEnv* env, jclass, jstring csvLine) {
     const char *csv_line = env->GetStringUTFChars(csvLine, nullptr);
     auto line_array = read_csvline(csv_line, false, "");
 
@@ -163,4 +163,26 @@ Java_com_example_scanner_data_repo_CollectionRepositoryKt_csvLineToArray(JNIEnv*
 
     env->ReleaseStringUTFChars(csvLine, csv_line);
     return lineArray;
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_example_scanner_MainActivityKt_arrayToCsvLine(JNIEnv* env, jclass, jobjectArray stringArray) {
+    jsize arrayLength = env->GetArrayLength(stringArray);
+
+    std::vector<std::string> records;
+
+    for (jsize i = 0; i < arrayLength; ++i) {
+        jstring jStr = static_cast<jstring>(env->GetObjectArrayElement(stringArray, i));
+        const char* cStr = env->GetStringUTFChars(jStr, nullptr);
+
+        records.push_back(std::string(cStr));
+
+        env->ReleaseStringUTFChars(jStr, cStr);
+        env->DeleteLocalRef(jStr);
+    }
+
+    std::string csvLine = to_csvline(records);
+
+    return env->NewStringUTF(csvLine.c_str());
 }

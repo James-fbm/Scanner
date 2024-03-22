@@ -43,5 +43,12 @@ class MainActivity : ComponentActivity() {
             System.loadLibrary("scanner")
         }
     }
+
+
 }
 
+typealias IndexRecord = Map<String, Array<String>>?
+external fun readExcelRecord(filePath: String, fileType: String, indexIdArray: IntArray): IndexRecord
+external fun readExcelHeader(filePath: String, fileType: String): Array<String>?
+external fun csvLineToArray(csvLine: String): Array<String>
+external fun arrayToCsvLine(stringArray: Array<String>): String

@@ -35,7 +35,6 @@ class VolumeRepository @Inject constructor(
             // id will be ignored here
             volumeId = 0,
             volumeName = volumeAddUiModel.volumeName,
-            volumeSource = "",
             collectionId = collectionId,
             createTime = Date(),
             modifyTime = Date()
