@@ -1,7 +1,5 @@
 package com.example.scanner.data.repo
 
-import com.example.scanner.R
-import com.example.scanner.data.SQLITE_BATCHSIZE
 import com.example.scanner.data.dao.VolumeDao
 import com.example.scanner.data.entity.VolumeEntity
 import com.example.scanner.ui.viewmodel.VolumeAddUiModel
@@ -36,10 +34,13 @@ class VolumeRepository @Inject constructor(
             volumeId = 0,
             volumeName = volumeAddUiModel.volumeName,
             collectionId = collectionId,
+            // manually added volumes do not have titleLine and indexLine attributes
+            titleLine = "",
+            indexLine = "",
             createTime = Date(),
             modifyTime = Date()
         )
-        volumeDao.insertOne(volumeEntity)
+        volumeDao.insertOneEntity(volumeEntity)
     }
 
     suspend fun deleteVolumeFromUiModelList(toDeleteItemUiModelList: List<VolumeItemUiModel>) {

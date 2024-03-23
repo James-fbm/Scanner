@@ -7,7 +7,6 @@ import com.example.scanner.data.dao.VolumeDao
 import com.example.scanner.data.entity.CollectionEntity
 import com.example.scanner.data.entity.VolumeEntity
 import com.example.scanner.data.entity.VolumeSourceEntity
-import com.example.scanner.data.entity.VolumeTitleEntity
 import com.example.scanner.readExcelHeader
 import com.example.scanner.readExcelRecord
 import com.example.scanner.ui.viewmodel.CollectionAddUiModel
@@ -78,9 +77,12 @@ class CollectionRepository @Inject constructor(
             modifyTime = Date()
         )
 
+        // first insert new collection and fetch its automatically allocated id
         val newCollectionId = collectionDao.insertOne(collectionEntity)
 
         val record = readExcelRecord(excelImportUiModel.filePath, excelImportUiModel.fileType, indexIdArray) ?: return 0
+
+        val volumeRecord: VolumeDBRecord = mutableListOf()
         record.map {r ->
             var volumeName: String = ""
             val keyArray = csvLineToArray(r.key)
@@ -91,26 +93,20 @@ class CollectionRepository @Inject constructor(
                 }
             }
 
+            val indexIdStringArray = indexIdArray.map { index -> index.toString() }.toTypedArray()
+            val titleArray = readExcelHeader(excelImportUiModel.filePath, excelImportUiModel.fileType) ?: return 0
             val newVolumeEntity = VolumeEntity(
                 // id will be ignored here
                 volumeId = 0,
                 volumeName = volumeName,
+                titleLine = arrayToCsvLine(titleArray),
+                indexLine = arrayToCsvLine(indexIdStringArray),
                 collectionId = newCollectionId.toInt(),
                 createTime = Date(),
                 modifyTime = Date()
             )
 
-            val indexIdStringArray = indexIdArray.map { index -> index.toString() }.toTypedArray()
-            val titleArray = readExcelHeader(excelImportUiModel.filePath, excelImportUiModel.fileType) ?: return 0
-            val newVolumeTitleEntity = VolumeTitleEntity(
-                titleId = 0,
-                titleLine = arrayToCsvLine(titleArray),
-                indexLine = arrayToCsvLine(indexIdStringArray),
-                // volumeId refers to the volumeId of newVolumeEntity and can only be fetched after it has been written into database
-                volumeId = 0
-            )
-
-            val newVolumeSourceEntityArray: MutableList<VolumeSourceEntity> = mutableListOf()
+            val newVolumeSourceEntityList: MutableList<VolumeSourceEntity> = mutableListOf()
             for (recordLine in r.value) {
                 val newVolumeSourceEntity = VolumeSourceEntity(
                     sourceId = 0,
@@ -118,10 +114,15 @@ class CollectionRepository @Inject constructor(
                     // same as volumeId in newVolumeTitleEntity
                     volumeId = 0
                 )
-                newVolumeSourceEntityArray.add(newVolumeSourceEntity)
+                newVolumeSourceEntityList.add(newVolumeSourceEntity)
             }
+
+            volumeRecord.add(Pair(newVolumeEntity, newVolumeSourceEntityList))
         }
 
+        volumeDao.insertVolumeRecord(volumeRecord)
         return record.keys.size
     }
 }
+
+typealias VolumeDBRecord = MutableList<Pair<VolumeEntity, List<VolumeSourceEntity>>>

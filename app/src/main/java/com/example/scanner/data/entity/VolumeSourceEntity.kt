@@ -25,6 +25,6 @@ data class VolumeSourceEntity (
     val sourceLine: String,
 
     @ColumnInfo("volume_id")
-    val volumeId: Int
+    var volumeId: Int
 
 )

@@ -6,6 +6,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.example.scanner.data.SQLITE_BATCHSIZE
 import com.example.scanner.data.entity.VolumeEntity
+import com.example.scanner.data.entity.VolumeSourceEntity
+import com.example.scanner.data.repo.VolumeDBRecord
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
@@ -15,10 +17,33 @@ interface VolumeDao {
     fun getVolumeByCollectionId(collectionId: Int): Flow<List<VolumeEntity>>
 
     @Insert
-    suspend fun insertOne(volumeEntity: VolumeEntity)
+    suspend fun insertOneEntity(volumeEntity: VolumeEntity): Long
 
     @Insert
-    suspend fun insertFromList(volumeEntityList: List<VolumeEntity>)
+    suspend fun insertEntityList(volumeEntityList: List<VolumeEntity>): List<Long>
+
+    @Insert
+    suspend fun insertSourceEntityList(volumeSourceEntityList: List<VolumeSourceEntity>)
+
+    @Transaction
+    suspend fun insertVolumeRecord(volumeRecord: VolumeDBRecord) {
+        val entityDBList: List<VolumeEntity> = volumeRecord.map { entityPair ->
+            entityPair.first
+        }
+        val entityIdList = insertEntityList(entityDBList)
+
+        val sourceEntityDBList: List<VolumeSourceEntity> = volumeRecord.flatMapIndexed { index, entityPair ->
+            entityPair.second.map { sourceEntity ->
+                VolumeSourceEntity(
+                    sourceId = sourceEntity.sourceId,
+                    sourceLine = sourceEntity.sourceLine,
+                    volumeId = entityIdList[index].toInt()
+                )
+            }
+        }
+        
+        insertSourceEntityList(sourceEntityDBList)
+    }
 
     @Query("DELETE FROM tb_volume WHERE volume_id in (:idList)")
     suspend fun deleteByIdList(idList: List<Int>)
