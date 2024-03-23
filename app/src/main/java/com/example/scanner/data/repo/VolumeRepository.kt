@@ -1,10 +1,12 @@
 package com.example.scanner.data.repo
 
+import com.example.scanner.csvLineToArray
 import com.example.scanner.data.dao.VolumeDao
 import com.example.scanner.data.entity.VolumeEntity
 import com.example.scanner.ui.viewmodel.VolumeAddUiModel
 import com.example.scanner.ui.viewmodel.VolumeEditUiModel
 import com.example.scanner.ui.viewmodel.VolumeItemUiModel
+import com.example.scanner.ui.viewmodel.VolumeViewUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.Date
@@ -34,6 +36,7 @@ class VolumeRepository @Inject constructor(
             volumeId = 0,
             volumeName = volumeAddUiModel.volumeName,
             collectionId = collectionId,
+            fromExcel = false,
             // manually added volumes do not have titleLine and indexLine attributes
             titleLine = "",
             indexLine = "",
@@ -60,7 +63,26 @@ class VolumeRepository @Inject constructor(
         volumeDao.updateOne(volumeId, volumeName, modifyTime)
     }
 
-    suspend fun getVolumeSourceMapFromUiModel(volumeItemUiModel: VolumeItemUiModel): Map<String, String> {
-        return emptyMap()
+    suspend fun getVolumeViewUiModelFromUiModel(volumeItemUiModel: VolumeItemUiModel): VolumeViewUiModel {
+        val volumeEntity = volumeDao.getOneVolumeByVolumeId(volumeItemUiModel.volumeId)
+        val volumeSourceEntityList = volumeDao.getVolumeSourceByVolumeId(volumeItemUiModel.volumeId)
+
+        val titleArray = csvLineToArray(volumeEntity.titleLine)
+        val indexArray = csvLineToArray(volumeEntity.indexLine)
+        val sourceTripleList = volumeSourceEntityList.map { sourceEntity ->
+            val sourceArray = csvLineToArray(sourceEntity.sourceLine)
+            titleArray.mapIndexed { index, _ ->
+                if (index.toString() in indexArray)
+                    Triple(titleArray[index], sourceArray[index], true)
+                else
+                    Triple(titleArray[index], sourceArray[index], false)
+            }
+        }
+        return VolumeViewUiModel(
+            volumeName = volumeEntity.volumeName,
+            fromExcel = volumeEntity.fromExcel,
+            volumeSource = sourceTripleList,
+            dialogVisible = true
+        )
     }
 }

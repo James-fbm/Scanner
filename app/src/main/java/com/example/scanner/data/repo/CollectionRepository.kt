@@ -99,6 +99,7 @@ class CollectionRepository @Inject constructor(
                 // id will be ignored here
                 volumeId = 0,
                 volumeName = volumeName,
+                fromExcel = true,
                 titleLine = arrayToCsvLine(titleArray),
                 indexLine = arrayToCsvLine(indexIdStringArray),
                 collectionId = newCollectionId.toInt(),

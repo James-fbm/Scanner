@@ -54,7 +54,8 @@ class CollectionViewModel @Inject constructor(
                     ),
                     volumeViewUiModel = VolumeViewUiModel(
                         "",
-                        emptyMap(),
+                        false,
+                        emptyList(),
                         false
                     ),
                     volumeDeleteUiModel = VolumeDeleteUiModel(
@@ -240,7 +241,7 @@ class CollectionViewModel @Inject constructor(
     }
 
     fun switchVolumeEditDialogVisibility(volumeItemUiModel: VolumeItemUiModel?) {
-        viewModelScope.launch {
+        viewModelScope.launch() {
             if (volumeItemUiModel == null) {
 
                 // called by dialog cancel button
@@ -291,7 +292,7 @@ class CollectionViewModel @Inject constructor(
     }
 
     fun switchVolumeViewDialogVisibility(volumeItemUiModel: VolumeItemUiModel?) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (volumeItemUiModel == null) {
 
                 // called by dialog cancel button
@@ -299,7 +300,8 @@ class CollectionViewModel @Inject constructor(
 
                 val newViewUiModel = VolumeViewUiModel(
                     volumeName = "",
-                    volumeSource = emptyMap(),
+                    false,
+                    volumeSource = emptyList(),
                     dialogVisible = false
                 )
 
@@ -316,13 +318,7 @@ class CollectionViewModel @Inject constructor(
             } else {
                 switchVolumeItemMenuVisibility(volumeItemUiModel)
 
-                val sourceMap = volumeRepository.getVolumeSourceMapFromUiModel(volumeItemUiModel)
-
-                val newViewUiModel = VolumeViewUiModel(
-                    volumeName = "",
-                    volumeSource = sourceMap,
-                    dialogVisible = true
-                )
+                val newViewUiModel = volumeRepository.getVolumeViewUiModelFromUiModel(volumeItemUiModel)
 
                 _collectionUiState.value = CollectionUiState.Success(
                     (_collectionUiState.value as CollectionUiState.Success).allVolumeItemCheckedState,
@@ -480,7 +476,8 @@ data class VolumeEditUiModel (
 
 data class VolumeViewUiModel (
     val volumeName: String,
-    val volumeSource: Map<String, String>,
+    val fromExcel: Boolean,
+    val volumeSource: List<List<Triple<String, String, Boolean>>>,
     val dialogVisible: Boolean
 )
 

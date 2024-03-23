@@ -26,6 +26,9 @@ data class VolumeEntity (
     @ColumnInfo("volume_name")
     val volumeName: String,
 
+    @ColumnInfo("from_excel")
+    val fromExcel: Boolean,
+
     @ColumnInfo("title_line")
     val titleLine: String,
 

@@ -16,6 +16,12 @@ interface VolumeDao {
     @Query("SELECT * FROM tb_volume WHERE collection_id = :collectionId")
     fun getVolumeByCollectionId(collectionId: Int): Flow<List<VolumeEntity>>
 
+    @Query("SELECT * FROM tb_volume WHERE volume_id = :volumeId")
+    fun getOneVolumeByVolumeId(volumeId: Int): VolumeEntity
+
+    @Query("SELECT * FROM tb_volume_source WHERE volume_id = :volumeId")
+    fun getVolumeSourceByVolumeId(volumeId: Int): List<VolumeSourceEntity>
+
     @Insert
     suspend fun insertOneEntity(volumeEntity: VolumeEntity): Long
 
